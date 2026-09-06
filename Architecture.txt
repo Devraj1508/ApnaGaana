@@ -1,0 +1,24 @@
+APNA GAANA
+│
+├── Frontend
+│   ├── React
+│   ├── React Router
+│   ├── Context / Zustand / Redux
+│   ├── Axios
+│   ├── HTML5 Audio
+│   ├── Three.js / React Three Fiber
+│   └── SCSS / CSS
+│
+├── Backend
+│   ├── Node.js
+│   ├── Express.js
+│   ├── MongoDB
+│   ├── Mongoose
+│   ├── JWT
+│   ├── HTTP-only Cookies
+│   └── Cloud Storage
+│
+└── External Services
+    ├── Image Storage
+    ├── Audio Storage
+    └── Optional CDN
