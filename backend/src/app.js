@@ -5,6 +5,8 @@ const authRouter = require("./Router/auth.routes");
 const userprofileRouter = require("./Router/userprofile.routes");
 const followuserRouter = require("./Router/follow.routes");
 const SongsRouter = require("./Router/songs.routes");
+const likesRouter  = require("./Router/like.routes");
+const commentsRouter = require("./Router/comment.routes");
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", userprofileRouter);
 app.use("/api/follow", followuserRouter);
 app.use("/api/songs", SongsRouter);
+app.use("/api/likes", likesRouter);
+app.use("/api/comments", commentsRouter);
 
 
 module.exports = app;
