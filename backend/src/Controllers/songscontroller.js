@@ -1,4 +1,4 @@
-const songmodel = require("../Models/songsmodel");
+const songmodel = require("../models/songsmodel");
 const ImageKit=require("@imagekit/nodejs")
 const {toFile}=require("@imagekit/nodejs")
 
@@ -6,7 +6,7 @@ const client = new ImageKit({
   privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
 });
 
-async function uploadSong(req, res) {
+async function uploadSong(req,res) {
     try {
         const UserId = req.user.id;
 
@@ -58,7 +58,7 @@ async function getSongsByUser(req,res){
         if(!userId){
             return res.status(400).json({ error: "User ID is required" });
         }
-        const songs=await songmodel.findById(userId).populate('uploadedBy','username profilePicture');
+        const songs=await songmodel.find({uploadedBy:userId}).populate('uploadedBy','username profilePicture');
         res.status(200).json({songs});
     }catch(error){
         console.error("Error fetching songs by user:", error);
@@ -90,9 +90,13 @@ async function updateSong(req,res){
     try{
         const songId=req.params.id;
         const {title,artist,cover,duration}=req.body;
-        const song=await songmodel.findByIdAndUpdate(songId,{title,artist,cover,duration},{new:true}).populate('uploadedBy','username profilePicture');
+
+        const song=await songmodel.findById(songId)
         if(!song){
             return res.status(404).json({error:"Song not found"});
+        }
+        if(req.user.id.toString() !== song.uploadedBy.toString()){
+            return res.status(403).json({error:"You are not authorized to update this song"});
         }
         if(title!==undefined){
             song.title=title;
@@ -106,6 +110,7 @@ async function updateSong(req,res){
         if(duration!==undefined){
             song.duration=duration;
         }
+        await song.save();
         res.status(200).json({song});
     }catch(error){
         console.error("Error updating song:", error);
@@ -117,14 +122,18 @@ async function updateSong(req,res){
 async function deleteSong(req,res){
     try{
         const songId=req.params.id;
+        const song=await songmodel.findById(songId);
         if(!songId){
             return res.status(400).json({error:"song ID is required"});
         }
-        const song=await songmodel.findByIdAndDelete(songId);
         if(!song){
             return res.status(404).json({error:"Song not found"});
         }
-        res.status(200).json({message:"Song deleted successfully"});
+        if(req.user.id.toString()!==song.uploadedBy.toString()){
+            return res.status(403).json({error:"You are not authorized to delete this song"});
+        }
+        const deletedSong=await songmodel.findByIdAndDelete(songId);
+        res.status(200).json({message:"Song deleted successfully",deletedSong});
     }catch(error){
         console.error("Error deleting song:", error);
         res.status(500).json({ error: "Error deleting song" });

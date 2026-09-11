@@ -15,7 +15,7 @@ async function getUserProfile(req, res) {
 }
 
 //update user profile
-async function updateUserProfile(req,res){
+async function updateUserProfile(req, res){
     try{
         const userId=req.user.id;
         const {username,email}=req.body;
