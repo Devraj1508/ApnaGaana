@@ -1,4 +1,5 @@
 const playlistmodel = require('../models/playlistmodels');
+const songmodel = require('../models/songsmodel');
 
 async function createPlaylist(req,res){
     try{
@@ -37,7 +38,7 @@ async function addSongToPlaylist(req,res){
     try{
         const userId=req.user.id;
         const playlistId=req.params.id;
-        const {songId}=req.body;
+        const {songId}=req.body || {};
 
         if(!playlistId || playlistId.trim() === ''){
             return res.status(400).json({message: "Playlist ID is required"});
@@ -57,15 +58,20 @@ async function addSongToPlaylist(req,res){
         }
 
         //check if the song is already in the playlist
-       const songExists = playlist.songs.some(
-    id => id.toString() === songId.toString()
-);
+       const song=await songmodel.findById(songId);
 
-if(songExists){
-    return res.status(400).json({
-        message: "Song is already in the playlist"
-    });
-}
+        if(!song){
+            return res.status(404).json({message: "Song not found"});
+        }
+
+        const songExists = playlist.songs.some(
+            id => id.toString() === songId.toString()
+        );
+
+        if(songExists){
+            return res.status(400).json({message: "Song is already in the playlist"});
+        }
+
         // Add the song to the playlist
         playlist.songs.push(songId);
         await playlist.save();
@@ -119,7 +125,7 @@ async function removeSongFromPlaylist(req,res){
     try{
         const userId=req.user.id;
         const playlistId=req.params.id;
-        const {songId}=req.body;
+        const {songId}=req.body || {};
 
         if(!playlistId || playlistId.trim() === ''){
             return res.status(400).json({message: "Playlist ID is required"});

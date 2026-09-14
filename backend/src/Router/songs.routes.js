@@ -10,7 +10,7 @@ Songsrouter.post('/upload',upload.single('file'),middleware,songscontroller.uplo
 Songsrouter.get('/all',songscontroller.getAllSongs);
 Songsrouter.get('/song/:id',songscontroller.getSongsByUser);
 Songsrouter.get('/songbyid/:id',songscontroller.getSongById);
-Songsrouter.put('/song/:id',songscontroller.updateSong);
-Songsrouter.delete('/song/:id',songscontroller.deleteSong);
-Songsrouter.get('/mysongs',songscontroller.getMySongs);
+Songsrouter.put('/song/:id',middleware,songscontroller.updateSong);
+Songsrouter.delete('/song/:id',middleware,songscontroller.deleteSong);
+Songsrouter.get('/mysongs',middleware,songscontroller.getMySongs);
 module.exports=Songsrouter;
