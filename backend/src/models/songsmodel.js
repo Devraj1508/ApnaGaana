@@ -21,12 +21,14 @@ const songSchema=new mongoose.Schema({
         type:Number,
         required:true
     },
-        uploadedBy: {
+    uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     }
 
+},{
+    timestamps:true
 });
 const songModel=mongoose.model("Song",songSchema);
 

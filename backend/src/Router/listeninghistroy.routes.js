@@ -1,8 +1,9 @@
 const express = require("express");
 const listeninghistoryRouter = express.Router();
 const listninghistoryController = require("../Controllers/listeninghistorycontroller");
+const middleware = require("../middleware/middleware");
 
-listeninghistoryRouter.post("/record", listninghistoryController.recordsongplay);
-listeninghistoryRouter.get("/history", listninghistoryController.getlisteninghistory);
+listeninghistoryRouter.post("/record", middleware, listninghistoryController.recordsongplay);
+listeninghistoryRouter.get("/history", middleware, listninghistoryController.getlisteninghistory);
 
 module.exports = listeninghistoryRouter;

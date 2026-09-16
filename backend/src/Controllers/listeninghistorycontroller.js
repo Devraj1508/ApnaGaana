@@ -3,14 +3,14 @@ const listeninghistorymodel = require('../models/listeninghistorymodel');
 async function recordsongplay(req,res){
     try{
         const userId=req.user.id;
-        const {songId}=req.body;
+        const {songId}=req.body || {};
 
-        if(!songId || songId.trim() === ''){
+        if(typeof songId !== 'string' || songId.trim() === ''){
             return res.status(400).json({message: "Song ID is required"});
         }
         const newReord=await listeninghistorymodel.create({
             user:userId,
-            song:songId
+            song:songId.trim()
         });
         res.status(201).json({message:"Song play recorded successfully",record:newReord});
     } catch(error){

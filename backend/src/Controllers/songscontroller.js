@@ -152,8 +152,30 @@ async function getMySongs(req,res){
     }
 }
 
+//search songs by title or artist
+async function searchSongs(req,res){
+    try{
+        const {query}=req.query;
+        if(!query || query.trim()=== ''){
+            return res.status(400).json({error:"Search query is required"});
+        }
+        const songs=await songmodel.find({
+            $or:[
+                {title:{$regex:query,$options:'i'}},
+                {artist:{$regex:query,$options:'i'}}
+            ]
+        }).populate('uploadedBy','username profilePicture');
+        res.status(200).json({
+            message:"song found successfully",
+            songs});
+    }catch(error){
+        console.error("Error searching songs:", error);
+        res.status(500).json({ error: "Error searching songs" });
+    }
+}
+
 
 module.exports = {
-    uploadSong,getAllSongs,getSongsByUser,getSongById,updateSong,deleteSong,getMySongs
+    uploadSong,getAllSongs,getSongsByUser,getSongById,updateSong,deleteSong,getMySongs,searchSongs
 };
 
