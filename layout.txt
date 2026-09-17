@@ -8,7 +8,7 @@ APNA GAANA
 │   ├── JWT Authentication ^
 │   └── Protected Routes ^
 │
-├── 👤 USER / PROFILE 
+├── 👤 USER / PROFILE -->done
 │   ├── Get Profile ^
 │   ├── Update Profile ^
 │   ├── Profile Picture
@@ -22,7 +22,7 @@ APNA GAANA
 │   ├── Get Following ^
 │   └── Check Follow Status 
 │
-├── 🎵 SONGS
+├── 🎵 SONGS -->done
 │   ├── Upload Song
 │   ├── Get All Songs
 │   ├── Get Single Song
@@ -33,7 +33,7 @@ APNA GAANA
 │   ├── Song Details
 │   └── Play Count
 │
-├── 🎤 ARTISTS
+├── 🎤 ARTISTS -->done
 │   ├── Create Artist Profile
 │   ├── Get Artist
 │   ├── Update Artist
@@ -41,21 +41,21 @@ APNA GAANA
 │   ├── Artist Albums
 │   └── Follow Artist
 │
-├── ❤️ LIKES
+├── ❤️ LIKES  -->done
 │   ├── Like Song
 │   ├── Unlike Song
 │   ├── Get Song Likes
 │   ├── Check Like Status
 │   └── Liked Songs
 │
-├── 💬 COMMENTS
+├── 💬 COMMENTS -->done
 │   ├── Add Comment
 │   ├── Get Comments
 │   ├── Update Comment
 │   ├── Delete Comment
 │   └── Comment Like
 │
-├── 📂 PLAYLISTS
+├── 📂 PLAYLISTS  -->done
 │   ├── Create Playlist
 │   ├── Get Playlists
 │   ├── Get Single Playlist
@@ -65,14 +65,14 @@ APNA GAANA
 │   ├── Remove Song
 │   └── Public / Private Playlist
 │
-├── 🔎 SEARCH
+├── 🔎 SEARCH  -->done
 │   ├── Search Songs
 │   ├── Search Artists
 │   ├── Search Users
 │   ├── Search Playlists
 │   └── Global Search
 │
-├── 🏠 HOME / DISCOVERY
+├── 🏠 HOME / DISCOVERY -->done
 │   ├── Trending Songs
 │   ├── New Releases
 │   ├── Popular Artists
@@ -111,3 +111,4 @@ APNA GAANA
     ├── Particle Effects
     ├── Interactive Music Environment
     └── Three.js Animations
+    
