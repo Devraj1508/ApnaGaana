@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
 
 const authRouter = require("./Router/auth.routes");
 const userprofileRouter = require("./Router/userprofile.routes");
@@ -13,6 +14,10 @@ const DiscoveryRouter = require("./Router/Discovery.routes");
 
 const app = express();
 
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  credentials: true, // Allow credentials (cookies) to be sent
+}));
 app.use(express.json());
 app.use(cookieParser());
 

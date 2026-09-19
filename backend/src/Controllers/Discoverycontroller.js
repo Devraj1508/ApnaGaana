@@ -22,9 +22,12 @@ async function getDiscoveryData(req,res){
                 _id:"$song",
                 likeCount:{$sum:1}
             }
-        }, {
+        },
+         {
             $sort:{likeCount:-1}
-        },{
+        },
+        
+        {
             $limit:10
         }]);
         const popularSongIds=popularSongs.map(song=>song._id);

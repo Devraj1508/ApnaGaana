@@ -1,9 +1,10 @@
 import {useState} from 'react';
 import {registerUser, loginUser, getCurrentUser as fetchCurrentUser, logoutUser} from '../service/auth.api';
 
+
 const useAuth = () => {
     const [user,setUser] = useState(null);
-    const [loading,setLoading] = useState(true);
+    const [loading,setLoading] = useState(false);
     const [error,setError] = useState(null);
 
     const register = async (userData) => {
