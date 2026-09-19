@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthForm from "./features/auth/components/AuthForm";
+import Discovery from "./features/discovery/pages/Discovery";
 
 const App = () => {
     return (
         <Routes>
-            <Route path="/" element={<h1>Welcome to Apna Gaana</h1>} />
+            <Route path="/" element={<Discovery />} />
 
             <Route
                 path="/login"
