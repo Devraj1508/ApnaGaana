@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import "../style/auth.scss";
 
-const AuthForm = ({ mode = "login" }) => {
-    const isLogin = mode === "login";
+const AuthForm = ({ type = "login" }) => {
+    const isLogin = type === "login";
 
     const navigate = useNavigate();
 

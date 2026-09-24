@@ -15,8 +15,11 @@ const DiscoveryRouter = require("./Router/Discovery.routes");
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Replace with your frontend URL
-  credentials: true, // Allow credentials (cookies) to be sent
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:5174"
+    ],
+    credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());

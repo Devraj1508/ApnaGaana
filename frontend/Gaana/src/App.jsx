@@ -1,5 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import AuthForm from "./features/auth/components/AuthForm";
+import { Routes, Route } from "react-router-dom";
+
+import Login from "./features/auth/pages/Login";
+import Register from "./features/auth/pages/Register";
 import Discovery from "./features/discovery/pages/Discovery";
 
 const App = () => {
@@ -9,16 +11,15 @@ const App = () => {
 
             <Route
                 path="/login"
-                element={<AuthForm mode="login" />}
+                element={<Login />}
             />
 
             <Route
                 path="/register"
-                element={<AuthForm mode="register" />}
+                element={<Register />}
             />
         </Routes>
     );
 };
 
 export default App;
-

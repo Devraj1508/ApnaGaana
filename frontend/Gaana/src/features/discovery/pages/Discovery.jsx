@@ -1,5 +1,6 @@
 import SongCard from "../components/SongCard";
 import useDiscovery from "../hooks/useDiscovery";
+import MusicPlayer from "../../songs/components/MusicPlayer";
 import "../style/Discovery.scss";
 
 function Discovery() {
@@ -94,12 +95,15 @@ function Discovery() {
 
                     {discoveryData?.latestSongs?.map((song) => (
 
-                        <SongCard
-                            key={song._id}
-                            title={song.title}
-                            artist={song.uploadedBy?.username}
-                            image={song.cover}
-                        />
+                       <SongCard
+                        key={song._id}
+                        song={song}
+                        songs={discoveryData.latestSongs}
+                        title={song.title}
+                        artist={song.uploadedBy?.username}
+                        image={song.cover}
+                        audio={song.audio}
+                           />
 
                     ))}
 
@@ -118,10 +122,13 @@ function Discovery() {
                     {discoveryData?.popularSongs?.map((song) => (
 
                         <SongCard
-                            key={song._id}
-                            title={song.title}
-                            artist={song.uploadedBy?.username}
-                            image={song.cover}
+                        key={song._id}
+                        song={song}
+                        songs={discoveryData.popularSongs}
+                        title={song.title}
+                        artist={song.uploadedBy?.username}
+                        image={song.cover}
+                        audio={song.audio}
                         />
 
                     ))}
@@ -141,10 +148,13 @@ function Discovery() {
                     {discoveryData?.recentlyPlayed?.map((song) => (
 
                         <SongCard
-                            key={song._id}
-                            title={song.title}
-                            artist={song.uploadedBy?.username}
-                            image={song.cover}
+                         key={song._id}
+                        song={song}
+                        songs={discoveryData.recentlyPlayed}
+                        title={song.title}
+                        artist={song.uploadedBy?.username}
+                        image={song.cover}
+                        audio={song.audio}
                         />
 
                     ))}
@@ -152,6 +162,8 @@ function Discovery() {
                 </div>
 
             </section>
+
+             <MusicPlayer />
 
         </div>
     );

@@ -1,8 +1,31 @@
+import { useMusicContext } from "../../../app/context/MusicContext";
+
 function SongCard({
     title,
     artist,
-    image
+    image,
+    audio,
+    song,
+    songs
 }) {
+    const {
+        playSong,
+        currentSong,
+        isPlaying,
+        togglePlayPause
+    } = useMusicContext();
+
+    const handlePlay = () => {
+        console.log("PLAY BUTTON CLICKED");
+        console.log("Audio URL:", audio);
+
+        if (currentSong?.audio === audio) {
+            togglePlayPause();
+        } else {
+            playSong(song, songs);
+        }
+    };
+
     return (
         <div className="song-card">
 
@@ -22,8 +45,14 @@ function SongCard({
                 <p>{artist}</p>
             </div>
 
-            <button className="play-button">
-                ▶
+            <button
+                className="play-button"
+                onClick={handlePlay}
+            >
+                {currentSong?.audio === audio && isPlaying
+                    ? "❚❚"
+                    : "▶"
+                }
             </button>
 
         </div>
