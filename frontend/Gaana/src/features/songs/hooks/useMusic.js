@@ -17,8 +17,15 @@ const useMusic = () => {
     const [repeatMode, setRepeatMode] = useState("off");
     const repeatModeRef = useRef("off");
 
-    const soundRef = useRef(null);
+    const [isShuffle, setIsShuffle] = useState(false);
+    const isShuffleRef = useRef(false);
 
+    const shuffleHistoryRef = useRef([]);
+
+    const soundRef = useRef(null);
+    const shufflePositionRef = useRef(-1);
+
+    
     // Refs latest playlist/index ko hold karenge
     const playlistRef = useRef([]);
     const currentIndexRef = useRef(-1);
@@ -74,21 +81,35 @@ const useMusic = () => {
                 setIsPlaying(false);
             },
 
-            onend: () => {
-                  setIsPlaying(false);
-                  setCurrentTime(0);
+           onend: () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
 
-                   if (repeatModeRef.current === "one") {
-                         playSong(
-                            song,
-                            playlistRef.current,
-                            currentIndexRef.current
-                                 );
-                    return;
-                   }
+    // Repeat ONE
+    if (repeatModeRef.current === "one") {
+        playSong(
+            song,
+            playlistRef.current,
+            currentIndexRef.current
+        );
+        return;
+    }
 
-                    playNextSong();
-                         },
+    // Shuffle ON
+    if (isShuffleRef.current) {
+        playNextSong();
+        return;
+    }
+
+    // Normal playlist + Repeat ALL
+    if (repeatModeRef.current === "all") {
+        playNextSong();
+        return;
+    }
+
+    // Playlist finished
+    console.log("Playlist finished");
+},
 
             onloaderror: (id, error) => {
                 console.error("Audio loading error:", error);
@@ -137,67 +158,142 @@ const useMusic = () => {
     };
 
     // NEXT SONG
-    const playNextSong = () => {
-        const songs = playlistRef.current;
-        const index = currentIndexRef.current;
+const playNextSong = () => {
+    const songs = playlistRef.current;
+    const index = currentIndexRef.current;
 
-        if (songs.length === 0) {
-            return;
-        }
+    if (songs.length === 0) return;
 
-        const nextIndex = index + 1;
+    let nextIndex;
 
-       if (nextIndex >= songs.length) {
+    if (isShuffleRef.current) {
 
-    if (repeatModeRef.current === "all") {
-        const firstSong = songs[0];
-
-        currentIndexRef.current = 0;
-        setCurrentIndex(0);
-
-        playSong(firstSong, songs, 0);
-
-        return;
+    // First shuffle play
+    if (shuffleHistoryRef.current.length === 0) {
+        shuffleHistoryRef.current.push(index);
+        shufflePositionRef.current = 0;
     }
 
-    console.log("Playlist finished");
+    // Agar Previous ke baad Next dabaya
+    if (
+        shufflePositionRef.current <
+        shuffleHistoryRef.current.length - 1
+    ) {
+        shufflePositionRef.current++;
 
-    setIsPlaying(false);
-    return;
-}
+        nextIndex =
+            shuffleHistoryRef.current[
+                shufflePositionRef.current
+            ];
+    } else {
 
-        const nextSong = songs[nextIndex];
+        // Unplayed songs find karo
+        const availableIndexes = songs
+            .map((_, i) => i)
+            .filter(
+                i => !shuffleHistoryRef.current.includes(i)
+            );
 
-        currentIndexRef.current = nextIndex;
-        setCurrentIndex(nextIndex);
+        if (availableIndexes.length === 0) {
 
-        playSong(nextSong, songs, nextIndex);
-    };
+            // New shuffle cycle
+            shuffleHistoryRef.current = [index];
+            shufflePositionRef.current = 0;
 
-    // PREVIOUS SONG
-    const playPreviousSong = () => {
-        const songs = playlistRef.current;
-        const index = currentIndexRef.current;
+            const possibleIndexes = songs
+                .map((_, i) => i)
+                .filter(i => i !== index);
 
-        if (songs.length === 0) {
-            return;
+            nextIndex =
+                possibleIndexes[
+                    Math.floor(
+                        Math.random() * possibleIndexes.length
+                    )
+                ];
+
+            shuffleHistoryRef.current.push(nextIndex);
+            shufflePositionRef.current = 1;
+
+        } else {
+
+            nextIndex =
+                availableIndexes[
+                    Math.floor(
+                        Math.random() * availableIndexes.length
+                    )
+                ];
+
+            shuffleHistoryRef.current.push(nextIndex);
+            shufflePositionRef.current++;
         }
+    }
 
-        const previousIndex = index - 1;
+} else {
+
+        // Normal sequential mode
+        nextIndex = index + 1;
+
+        if (nextIndex >= songs.length) {
+
+            if (repeatModeRef.current === "all") {
+                nextIndex = 0;
+            } else {
+                console.log("Playlist finished");
+                setIsPlaying(false);
+                return;
+            }
+        }
+    }
+
+    const nextSong = songs[nextIndex];
+
+    console.log("Next song:", nextSong);
+    console.log("Shuffle:", isShuffleRef.current);
+    console.log("Shuffle history:", shuffleHistoryRef.current);
+
+    currentIndexRef.current = nextIndex;
+    setCurrentIndex(nextIndex);
+
+    playSong(nextSong, songs, nextIndex);
+};
+    // PREVIOUS SONG
+   const playPreviousSong = () => {
+    const songs = playlistRef.current;
+
+    if (songs.length === 0) return;
+
+    let previousIndex;
+
+    if (
+        isShuffleRef.current &&
+        shufflePositionRef.current > 0
+    ) {
+        shufflePositionRef.current--;
+
+        previousIndex =
+            shuffleHistoryRef.current[
+                shufflePositionRef.current
+            ];
+    } else {
+        previousIndex = currentIndexRef.current - 1;
 
         if (previousIndex < 0) {
             return;
         }
+    }
 
-        const previousSong = songs[previousIndex];
+    const previousSong = songs[previousIndex];
 
-        currentIndexRef.current = previousIndex;
-        setCurrentIndex(previousIndex);
+    currentIndexRef.current = previousIndex;
+    setCurrentIndex(previousIndex);
 
-        playSong(previousSong, songs, previousIndex);
-    };
-
-    // SEEK
+    playSong(
+        previousSong,
+        songs,
+        previousIndex
+    );
+};
+    // SEEK 
     const seekTo = (time) => {
         if (!soundRef.current) {
             return;
@@ -262,7 +358,7 @@ const toggleMute = () => {
     }
 };
 
-const toggleRepeat = () => {
+    const toggleRepeat = () => {
     setRepeatMode((currentMode) => {
 
         let nextMode;
@@ -278,6 +374,24 @@ const toggleRepeat = () => {
         repeatModeRef.current = nextMode;
 
         return nextMode;
+    });
+};
+
+const toggleShuffle = () => {
+    setIsShuffle(current => {
+        const next = !current;
+
+        isShuffleRef.current = next;
+
+        if (!next) {
+            shuffleHistoryRef.current = [];
+        } else {
+            shuffleHistoryRef.current = [];
+        }
+
+        console.log("Shuffle changed:", next);
+
+        return next;
     });
 };
 
@@ -305,6 +419,7 @@ const toggleRepeat = () => {
     isMuted,
 
     repeatMode,
+    isShuffle,
 
     playSong,
     pauseSong,
@@ -319,7 +434,8 @@ const toggleRepeat = () => {
     changeVolume,
     toggleMute,
 
-    toggleRepeat
+    toggleRepeat,
+    toggleShuffle
     };
 };
 

@@ -19,6 +19,7 @@
     box-sizing: border-box;
 }
 
+
 /* --------------------------------
    Song Information
 -------------------------------- */
@@ -91,28 +92,81 @@
 
 
 /* --------------------------------
-   Controls
+   Main Controls
 -------------------------------- */
 
 .music-player-controls {
-    border: none;
-    background: transparent;
-    color: #fff;
+    flex: 1;
 
-    font-size: 20px;
+    max-width: 650px;
 
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 0 30px;
 }
 
-.music-player-button {
-   display: flex;
+
+/* --------------------------------
+   Previous / Play / Next / Repeat
+-------------------------------- */
+
+.music-player-buttons {
+    display: flex;
+
     align-items: center;
     justify-content: center;
+
     gap: 18px;
 }
 
-.music-player-button:hover {
+.music-control-button {
+     border: none;
+    background: transparent;
+
+    color: #ffffff;
+
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.music-control-button:hover {
     transform: scale(1.1);
+}
+
+.music-control-button.active {
+    color: #1db954 !important;
+}
+
+
+/* --------------------------------
+   Main Play / Pause Button
+-------------------------------- */
+
+.music-player-button {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #fff;
+    color: #000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: transform 0.15s ease;
+}
+
+.music-player-button:hover {
+    transform: scale(1.08);
 }
 
 
@@ -181,6 +235,70 @@
 
 
 /* --------------------------------
+   Volume
+-------------------------------- */
+
+.music-volume {
+    width: 160px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.music-volume-button {
+    border: none;
+    background: transparent;
+
+    color: #fff;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+.music-volume-slider {
+    flex: 1;
+
+    height: 4px;
+
+    appearance: none;
+
+    background: #555;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+.music-volume-slider::-webkit-slider-thumb {
+    appearance: none;
+
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    cursor: pointer;
+}
+
+.music-volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #fff;
+
+    cursor: pointer;
+}
+
+
+/* --------------------------------
    Responsive
 -------------------------------- */
 
@@ -213,7 +331,11 @@
         margin: 0 10px;
     }
 
+    .music-volume {
+        width: 100px;
+    }
 }
+
 
 @media (max-width: 500px) {
 
@@ -237,6 +359,10 @@
         margin: 0 5px;
     }
 
+    .music-player-buttons {
+        gap: 10px;
+    }
+
     .music-progress {
         gap: 4px;
     }
@@ -246,4 +372,26 @@
         font-size: 9px;
     }
 
+    .music-volume {
+        width: 70px;
+    }
+}
+
+.music-icon-box {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    transition: background 0.2s ease;
+}
+
+.music-control-button.active .music-icon-box {
+    background: #1db954;
 }

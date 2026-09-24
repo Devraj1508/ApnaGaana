@@ -1,15 +1,18 @@
 import { useMusicContext } from "../../../app/context/MusicContext";
+import  "../style/Music_player.scss";
 
 function MusicPlayer() {
     const {
-        currentSong,
+   currentSong,
     isPlaying,
-
     currentTime,
     duration,
 
     volume,
     isMuted,
+
+    repeatMode,
+    isShuffle,
 
     pauseSong,
     resumeSong,
@@ -17,9 +20,12 @@ function MusicPlayer() {
 
     playNextSong,
     playPreviousSong,
-    toggleRepeat,
+
     changeVolume,
-    toggleMute
+    toggleMute,
+    toggleRepeat,
+    toggleShuffle
+
     } = useMusicContext();
 
     // Agar koi song select nahi hai
@@ -55,30 +61,52 @@ function MusicPlayer() {
     return (
         <div className="music-player-controls">
 
-    <div className="music-player-buttons">
+ <div className="music-player-buttons">
 
-        <button
-            className="music-control-button"
-            onClick={playPreviousSong}
-        >
-            ⏮
-        </button>
+    <button
+    type="button"
+    className={`music-control-button ${isShuffle ? "active" : ""}`}
+    onClick={toggleShuffle}
+    title="Shuffle"
+>
+    <span className="music-icon-box">🔀</span>
+</button>
+     
+    <button
+        className="music-control-button"
+        onClick={playPreviousSong}
+    >
+        ⏮
+    </button>
 
-        <button
-            className="music-player-button"
-            onClick={handlePlayPause}
-        >
-            {isPlaying ? "❚❚" : "▶"}
-        </button>
+    <button
+        className="music-player-button"
+        onClick={handlePlayPause}
+    >
+        {isPlaying ? "❚❚" : "▶"}
+    </button>
 
-        <button
-            className="music-control-button"
-            onClick={playNextSong}
-        >
-            ⏭
-        </button>
+    <button
+        className="music-control-button"
+        onClick={playNextSong}
+    >
+        ⏭
+    </button>
 
-    </div>
+    <button
+    type="button"
+    className={`music-control-button ${
+        repeatMode !== "off" ? "active" : ""
+    }`}
+    onClick={toggleRepeat}
+    title="Repeat"
+>
+    <span className="music-icon-box">
+        {repeatMode === "one" ? "🔂" : "🔁"}
+    </span>
+</button>
+
+</div>
 
     {/* Progress */}
     <div className="music-progress">
