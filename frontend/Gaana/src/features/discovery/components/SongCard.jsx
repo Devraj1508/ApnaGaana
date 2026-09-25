@@ -1,4 +1,5 @@
 import { useMusicContext } from "../../../app/context/MusicContext";
+import { useNavigate } from "react-router-dom";
 
 function SongCard({
     title,
@@ -8,6 +9,8 @@ function SongCard({
     song,
     songs
 }) {
+    const navigate = useNavigate();
+
     const {
         playSong,
         currentSong,
@@ -25,9 +28,20 @@ function SongCard({
             playSong(song, songs);
         }
     };
+     const handleCardClick = () => {
+    navigate(`/song/${song._id}`, {
+        state: {
+            song,
+            songs
+        }
+    });
+};
 
     return (
-        <div className="song-card">
+        <div
+            className="song-card"
+            onClick={handleCardClick}
+        >
 
             <div className="song-cover">
                 {image ? (
@@ -47,7 +61,10 @@ function SongCard({
 
             <button
                 className="play-button"
-                onClick={handlePlay}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handlePlay();
+                }}
             >
                 {currentSong?.audio === audio && isPlaying
                     ? "❚❚"
