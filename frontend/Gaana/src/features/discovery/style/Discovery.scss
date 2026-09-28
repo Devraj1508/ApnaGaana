@@ -23,6 +23,25 @@
     }
 }
 
+.add-song-button,
+.profile-button {
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.add-song-button {
+    background: #1db954;
+    color: white;
+}
+
+.add-song-button:hover {
+    background: #1ed760;
+}
+
 .profile-button {
     padding: 0.7rem 1.2rem;
     border: none;

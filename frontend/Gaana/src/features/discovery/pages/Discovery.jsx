@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import SongCard from "../components/SongCard";
 import useDiscovery from "../hooks/useDiscovery";
 import MusicPlayer from "../../songs/components/MusicPlayer";
@@ -10,6 +11,8 @@ function Discovery() {
         loading,
         error
     } = useDiscovery();
+
+    const navigate = useNavigate();
 
     if (loading) {
         return (
@@ -36,6 +39,15 @@ function Discovery() {
                     <h1>Discover Music</h1>
                     <p>Find your next favourite song</p>
                 </div>
+
+               <button
+               type="button"
+               className="add-song-button"
+               onClick={() => navigate("/add-song")}
+               >
+               + Add Song
+              </button>
+
 
                 <button className="profile-button">
                     Profile
