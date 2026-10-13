@@ -103,6 +103,9 @@ function SongDetails() {
                         <img
                             src={displaySong.cover}
                             alt={displaySong.title}
+                            onError={() => {
+                                console.log("COVER URL FAILED:", displaySong.cover);
+                            }}
                         />
                     ) : (
                         <span>♪</span>
@@ -115,17 +118,13 @@ function SongDetails() {
 
                 <div className="song-details-info">
 
-                    <p className="song-type">
-                        SONG
-                    </p>
+                 <p className="song-type">SONG</p>
 
-                    <h1>
-                        <h1>{displaySong?.title}</h1>
-                    </h1>
+                  <h1>{displaySong.title}</h1>
 
-                    <h3>
-                        {song.uploadedBy?.username || "Unknown Artist"}
-                    </h3>
+                  <h3>
+                  {displaySong.uploadedBy?.username || "Unknown Artist"}
+                  </h3>
 
 
                     {/* =====================

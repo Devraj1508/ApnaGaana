@@ -10,26 +10,48 @@ async function uploadSong(req,res) {
     try {
         const UserId = req.user.id;
 
-          if(!req.file){
+          if(!req.files?.file?.[0]){
             return res.status(400).json({ error: "No file uploaded" });
           }
+
+           if(!req.files?.cover?.[0]){
+            return res.status(400).json({
+                error: "No cover image uploaded"
+            });
+        }
+
+         const audioFile = req.files.file[0];
+         const coverFile = req.files.cover[0];
+
 
         const issongalreadyexists = await songmodel.findOne({ title: req.body.title, uploadedBy: UserId });
         if (issongalreadyexists) {
             return res.status(400).json({ error: "Song with this title already exists" });
         }
 
+        // Upload audio file to ImageKit
         const file = await client.files.upload({
-        file: await toFile(Buffer.from(req.file.buffer), 'file'),
-        fileName: req.file.originalname,
+        file: await toFile(Buffer.from(audioFile.buffer), 'file'),
+        fileName: audioFile.originalname,
         folder:'dev-apna-gaana'
 });
+
+  // Upload cover to ImageKit
+        const coverUpload = await client.files.upload({
+            file: await toFile(
+                Buffer.from(coverFile.buffer),
+                'cover'
+            ),
+            fileName: coverFile.originalname,
+            folder:'dev-apna-gaana/covers'
+        });      
+
 const song=await songmodel.create({
              uploadedBy: UserId,
             title: req.body.title,
             artist: req.body.artist,
             audio: file.url,
-            cover: req.body.cover,
+            cover: coverUpload.url,
             duration: Number(req.body.duration)
 })
 res.status(200).json({ message: "Song uploaded successfully", song });

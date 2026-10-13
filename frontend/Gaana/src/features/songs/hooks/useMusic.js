@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 
 const useMusic = () => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -21,31 +21,93 @@ const useMusic = () => {
     const isShuffleRef = useRef(false);
 
     const shuffleHistoryRef = useRef([]);
-
-    const soundRef = useRef(null);
     const shufflePositionRef = useRef(-1);
 
-    
-    // Refs latest playlist/index ko hold karenge
+    const soundRef = useRef(null);
+
+    // Latest playlist and index
     const playlistRef = useRef([]);
     const currentIndexRef = useRef(-1);
 
-    const playSong = (song, songs = playlistRef.current, index = -1) => {
-        console.log("Playing:", song);
+    // =========================================================
+    // PLAY SONG
+    // =========================================================
+
+    const playSong = (
+        song,
+        songs = playlistRef.current,
+        index = -1
+    ) => {
+        console.log("================================");
+        console.log("PLAY SONG CALLED");
+        console.log("Song:", song?.title);
+        console.log("ID:", song?._id);
+        console.log("Audio:", song?.audio);
+        console.log("================================");
+
+        // =====================================================
+        // CHECK AUDIO
+        // =====================================================
 
         if (!song?.audio) {
             console.error("No audio URL provided.");
             return;
         }
 
-        // Previous song stop
-        if (soundRef.current) {
-            soundRef.current.stop();
-            soundRef.current.unload();
+        // =====================================================
+        // STOP AND REMOVE EVERY PREVIOUS AUDIO INSTANCE
+        // =====================================================
+
+        console.log("Stopping ALL previous audio...");
+
+        // Remove old reference first.
+        // This prevents callbacks from the old song
+        // from changing the new song's state.
+        const oldSound = soundRef.current;
+
+        soundRef.current = null;
+
+        // Stop old sound
+        if (oldSound) {
+            try {
+                oldSound.stop();
+            } catch (error) {
+                console.error(
+                    "Error stopping old sound:",
+                    error
+                );
+            }
+
+            try {
+                oldSound.unload();
+            } catch (error) {
+                console.error(
+                    "Error unloading old sound:",
+                    error
+                );
+            }
         }
 
-        // Playlist update
-        if (songs.length > 0) {
+        // Safety:
+        // Stop every Howler sound
+        Howler.stop();
+
+        // Remove every Howler sound
+        Howler.unload();
+
+        // =====================================================
+        // RESET PLAYER STATE
+        // =====================================================
+
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setDuration(0);
+
+        // =====================================================
+        // UPDATE PLAYLIST
+        // =====================================================
+
+        if (songs && songs.length > 0) {
             playlistRef.current = songs;
             setPlaylist(songs);
 
@@ -61,381 +123,750 @@ const useMusic = () => {
             setCurrentIndex(songIndex);
         }
 
-        setCurrentTime(0);
-        setDuration(0);
+        // =====================================================
+        // UPDATE CURRENT SONG
+        // =====================================================
+
+        setCurrentSong(song);
+
+        // =====================================================
+        // CREATE NEW HOWL
+        // =====================================================
+
+        console.log(
+            "Creating new Howl:",
+            song.title
+        );
+
+        console.log(
+            "Audio URL:",
+            song.audio
+        );
 
         const sound = new Howl({
+
             src: [song.audio],
-            html5: true,
+
+            // Use Web Audio instead of the HTML5 audio element.
+            // This gives every selected song a fresh audio instance.
+            html5: false,
+
             volume: isMuted ? 0 : volume,
 
+            // =================================================
+            // LOADED
+            // =================================================
+
             onload: () => {
-                setDuration(sound.duration());
+
+                console.log(
+                    "LOADED:",
+                    song.title
+                );
+
+                if (soundRef.current === sound) {
+                    setDuration(
+                        sound.duration()
+                    );
+                }
             },
+
+            // =================================================
+            // PLAY
+            // =================================================
 
             onplay: () => {
-                setIsPlaying(true);
+
+                console.log(
+                    "NOW PLAYING:",
+                    song.title
+                );
+
+                if (soundRef.current === sound) {
+                    setIsPlaying(true);
+                }
             },
+
+            // =================================================
+            // PAUSE
+            // =================================================
 
             onpause: () => {
-                setIsPlaying(false);
+
+                if (soundRef.current === sound) {
+                    setIsPlaying(false);
+                }
             },
 
-           onend: () => {
-    setIsPlaying(false);
-    setCurrentTime(0);
+            // =================================================
+            // STOP
+            // =================================================
 
-    // Repeat ONE
-    if (repeatModeRef.current === "one") {
-        playSong(
-            song,
-            playlistRef.current,
-            currentIndexRef.current
-        );
-        return;
-    }
+            onstop: () => {
 
-    // Shuffle ON
-    if (isShuffleRef.current) {
-        playNextSong();
-        return;
-    }
+                if (soundRef.current === sound) {
+                    setIsPlaying(false);
+                }
+            },
 
-    // Normal playlist + Repeat ALL
-    if (repeatModeRef.current === "all") {
-        playNextSong();
-        return;
-    }
+            // =================================================
+            // SONG END
+            // =================================================
 
-    // Playlist finished
-    console.log("Playlist finished");
-},
+            onend: () => {
+
+                console.log(
+                    "SONG ENDED:",
+                    song.title
+                );
+
+                // Ignore old/stale sound
+                if (soundRef.current !== sound) {
+                    return;
+                }
+
+                setIsPlaying(false);
+                setCurrentTime(0);
+
+                // =================================================
+                // REPEAT ONE
+                // =================================================
+
+                if (
+                    repeatModeRef.current === "one"
+                ) {
+
+                    playSong(
+                        song,
+                        playlistRef.current,
+                        currentIndexRef.current
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // SHUFFLE
+                // =================================================
+
+                if (
+                    isShuffleRef.current
+                ) {
+
+                    playNextSong();
+
+                    return;
+                }
+
+                // =================================================
+                // REPEAT ALL
+                // =================================================
+
+                if (
+                    repeatModeRef.current === "all"
+                ) {
+
+                    playNextSong();
+
+                    return;
+                }
+
+                // =================================================
+                // PLAYLIST FINISHED
+                // =================================================
+
+                console.log(
+                    "Playlist finished"
+                );
+            },
+
+            // =================================================
+            // LOAD ERROR
+            // =================================================
 
             onloaderror: (id, error) => {
-                console.error("Audio loading error:", error);
+
+                console.error(
+                    "Audio loading error:",
+                    song.title,
+                    error
+                );
             },
 
+            // =================================================
+            // PLAY ERROR
+            // =================================================
+
             onplayerror: (id, error) => {
-                console.error("Audio playing error:", error);
+
+                console.error(
+                    "Audio playing error:",
+                    song.title,
+                    error
+                );
             }
         });
 
+        // =====================================================
+        // STORE NEW SOUND
+        // =====================================================
+
         soundRef.current = sound;
 
-        setCurrentSong(song);
+        // =====================================================
+        // PLAY NEW SONG
+        // =====================================================
+
+        console.log(
+            "Starting new song:",
+            song.title
+        );
 
         sound.play();
     };
 
+    // =========================================================
+    // PAUSE
+    // =========================================================
+
     const pauseSong = () => {
+
         if (!soundRef.current) {
             return;
         }
 
         soundRef.current.pause();
+
         setIsPlaying(false);
     };
 
+    // =========================================================
+    // RESUME
+    // =========================================================
+
     const resumeSong = () => {
+
         if (!soundRef.current) {
             return;
         }
 
         soundRef.current.play();
+
         setIsPlaying(true);
     };
 
+    // =========================================================
+    // TOGGLE PLAY / PAUSE
+    // =========================================================
+
     const togglePlayPause = () => {
+
         if (!soundRef.current) {
             return;
         }
 
-        if (soundRef.current.playing()) {
+        if (
+            soundRef.current.playing()
+        ) {
+
             pauseSong();
+
         } else {
+
             resumeSong();
         }
     };
 
+    // =========================================================
     // NEXT SONG
-const playNextSong = () => {
-    const songs = playlistRef.current;
-    const index = currentIndexRef.current;
+    // =========================================================
 
-    if (songs.length === 0) return;
+    const playNextSong = () => {
 
-    let nextIndex;
+        const songs =
+            playlistRef.current;
 
-    if (isShuffleRef.current) {
+        const index =
+            currentIndexRef.current;
 
-    // First shuffle play
-    if (shuffleHistoryRef.current.length === 0) {
-        shuffleHistoryRef.current.push(index);
-        shufflePositionRef.current = 0;
-    }
+        if (songs.length === 0) {
+            return;
+        }
 
-    // Agar Previous ke baad Next dabaya
-    if (
-        shufflePositionRef.current <
-        shuffleHistoryRef.current.length - 1
-    ) {
-        shufflePositionRef.current++;
+        let nextIndex;
 
-        nextIndex =
-            shuffleHistoryRef.current[
-                shufflePositionRef.current
-            ];
-    } else {
+        // =====================================================
+        // SHUFFLE MODE
+        // =====================================================
 
-        // Unplayed songs find karo
-        const availableIndexes = songs
-            .map((_, i) => i)
-            .filter(
-                i => !shuffleHistoryRef.current.includes(i)
-            );
+        if (isShuffleRef.current) {
 
-        if (availableIndexes.length === 0) {
+            // First shuffle play
+            if (
+                shuffleHistoryRef.current.length === 0
+            ) {
 
-            // New shuffle cycle
-            shuffleHistoryRef.current = [index];
-            shufflePositionRef.current = 0;
+                shuffleHistoryRef.current.push(
+                    index
+                );
 
-            const possibleIndexes = songs
-                .map((_, i) => i)
-                .filter(i => i !== index);
+                shufflePositionRef.current = 0;
+            }
 
-            nextIndex =
-                possibleIndexes[
-                    Math.floor(
-                        Math.random() * possibleIndexes.length
-                    )
-                ];
+            // Previous ke baad Next dabaya
+            if (
+                shufflePositionRef.current <
+                shuffleHistoryRef.current.length - 1
+            ) {
 
-            shuffleHistoryRef.current.push(nextIndex);
-            shufflePositionRef.current = 1;
+                shufflePositionRef.current++;
+
+                nextIndex =
+                    shuffleHistoryRef.current[
+                        shufflePositionRef.current
+                    ];
+
+            } else {
+
+                // Find songs which haven't been played
+                const availableIndexes =
+                    songs
+                        .map((_, i) => i)
+                        .filter(
+                            (i) =>
+                                !shuffleHistoryRef.current.includes(
+                                    i
+                                )
+                        );
+
+                // All songs played
+                if (
+                    availableIndexes.length === 0
+                ) {
+
+                    // New shuffle cycle
+                    shuffleHistoryRef.current =
+                        [index];
+
+                    shufflePositionRef.current = 0;
+
+                    const possibleIndexes =
+                        songs
+                            .map((_, i) => i)
+                            .filter(
+                                (i) => i !== index
+                            );
+
+                    if (
+                        possibleIndexes.length === 0
+                    ) {
+                        return;
+                    }
+
+                    nextIndex =
+                        possibleIndexes[
+                            Math.floor(
+                                Math.random() *
+                                possibleIndexes.length
+                            )
+                        ];
+
+                    shuffleHistoryRef.current.push(
+                        nextIndex
+                    );
+
+                    shufflePositionRef.current = 1;
+
+                } else {
+
+                    nextIndex =
+                        availableIndexes[
+                            Math.floor(
+                                Math.random() *
+                                availableIndexes.length
+                            )
+                        ];
+
+                    shuffleHistoryRef.current.push(
+                        nextIndex
+                    );
+
+                    shufflePositionRef.current++;
+                }
+            }
 
         } else {
 
+            // =================================================
+            // NORMAL SEQUENTIAL MODE
+            // =================================================
+
             nextIndex =
-                availableIndexes[
-                    Math.floor(
-                        Math.random() * availableIndexes.length
-                    )
+                index + 1;
+
+            if (
+                nextIndex >= songs.length
+            ) {
+
+                if (
+                    repeatModeRef.current === "all"
+                ) {
+
+                    nextIndex = 0;
+
+                } else {
+
+                    console.log(
+                        "Playlist finished"
+                    );
+
+                    setIsPlaying(false);
+
+                    return;
+                }
+            }
+        }
+
+        const nextSong =
+            songs[nextIndex];
+
+        console.log(
+            "Next song:",
+            nextSong
+        );
+
+        console.log(
+            "Shuffle:",
+            isShuffleRef.current
+        );
+
+        console.log(
+            "Shuffle history:",
+            shuffleHistoryRef.current
+        );
+
+        currentIndexRef.current =
+            nextIndex;
+
+        setCurrentIndex(
+            nextIndex
+        );
+
+        playSong(
+            nextSong,
+            songs,
+            nextIndex
+        );
+    };
+
+    // =========================================================
+    // PREVIOUS SONG
+    // =========================================================
+
+    const playPreviousSong = () => {
+
+        const songs =
+            playlistRef.current;
+
+        if (songs.length === 0) {
+            return;
+        }
+
+        let previousIndex;
+
+        // =====================================================
+        // SHUFFLE PREVIOUS
+        // =====================================================
+
+        if (
+            isShuffleRef.current &&
+            shufflePositionRef.current > 0
+        ) {
+
+            shufflePositionRef.current--;
+
+            previousIndex =
+                shuffleHistoryRef.current[
+                    shufflePositionRef.current
                 ];
 
-            shuffleHistoryRef.current.push(nextIndex);
-            shufflePositionRef.current++;
-        }
-    }
+        } else {
 
-} else {
+            // =================================================
+            // NORMAL PREVIOUS
+            // =================================================
 
-        // Normal sequential mode
-        nextIndex = index + 1;
+            previousIndex =
+                currentIndexRef.current - 1;
 
-        if (nextIndex >= songs.length) {
-
-            if (repeatModeRef.current === "all") {
-                nextIndex = 0;
-            } else {
-                console.log("Playlist finished");
-                setIsPlaying(false);
+            if (previousIndex < 0) {
                 return;
             }
         }
-    }
 
-    const nextSong = songs[nextIndex];
+        const previousSong =
+            songs[previousIndex];
 
-    console.log("Next song:", nextSong);
-    console.log("Shuffle:", isShuffleRef.current);
-    console.log("Shuffle history:", shuffleHistoryRef.current);
+        currentIndexRef.current =
+            previousIndex;
 
-    currentIndexRef.current = nextIndex;
-    setCurrentIndex(nextIndex);
+        setCurrentIndex(
+            previousIndex
+        );
 
-    playSong(nextSong, songs, nextIndex);
-};
-    // PREVIOUS SONG
-   const playPreviousSong = () => {
-    const songs = playlistRef.current;
+        playSong(
+            previousSong,
+            songs,
+            previousIndex
+        );
+    };
 
-    if (songs.length === 0) return;
+    // =========================================================
+    // SEEK
+    // =========================================================
 
-    let previousIndex;
-
-    if (
-        isShuffleRef.current &&
-        shufflePositionRef.current > 0
-    ) {
-        shufflePositionRef.current--;
-
-        previousIndex =
-            shuffleHistoryRef.current[
-                shufflePositionRef.current
-            ];
-    } else {
-        previousIndex = currentIndexRef.current - 1;
-
-        if (previousIndex < 0) {
-            return;
-        }
-    }
-
-    const previousSong = songs[previousIndex];
-
-    currentIndexRef.current = previousIndex;
-    setCurrentIndex(previousIndex);
-
-    playSong(
-        previousSong,
-        songs,
-        previousIndex
-    );
-};
-    // SEEK 
     const seekTo = (time) => {
+
         if (!soundRef.current) {
             return;
         }
 
-        const newTime = Math.max(
-            0,
-            Math.min(time, duration)
+        const newTime =
+            Math.max(
+                0,
+                Math.min(
+                    time,
+                    duration
+                )
+            );
+
+        soundRef.current.seek(
+            newTime
         );
 
-        soundRef.current.seek(newTime);
-
-        setCurrentTime(newTime);
+        setCurrentTime(
+            newTime
+        );
     };
 
-    // Current time update
+    // =========================================================
+    // CURRENT TIME UPDATE
+    // =========================================================
+
     useEffect(() => {
+
         let interval;
 
-        if (isPlaying && soundRef.current) {
-            interval = setInterval(() => {
-                const seek = soundRef.current.seek();
+        if (
+            isPlaying &&
+            soundRef.current
+        ) {
 
-                if (typeof seek === "number") {
-                    setCurrentTime(seek);
-                }
-            }, 500);
+            interval =
+                setInterval(() => {
+
+                    if (!soundRef.current) {
+                        return;
+                    }
+
+                    const seek =
+                        soundRef.current.seek();
+
+                    if (
+                        typeof seek === "number"
+                    ) {
+
+                        setCurrentTime(
+                            seek
+                        );
+                    }
+
+                }, 500);
         }
 
         return () => {
             clearInterval(interval);
         };
+
     }, [isPlaying]);
 
-    const changeVolume = (newVolume) => {
-    const value = Math.max(0, Math.min(newVolume, 1));
+    // =========================================================
+    // VOLUME
+    // =========================================================
 
-    setVolume(value);
+    const changeVolume = (
+        newVolume
+    ) => {
 
-    if (soundRef.current) {
-        soundRef.current.volume(value);
-    }
+        const value =
+            Math.max(
+                0,
+                Math.min(
+                    newVolume,
+                    1
+                )
+            );
 
-    if (value > 0) {
-        setIsMuted(false);
-    }
-};
+        setVolume(value);
 
+        if (soundRef.current) {
 
+            soundRef.current.volume(
+                value
+            );
+        }
 
-const toggleMute = () => {
-    if (!soundRef.current) {
-        return;
-    }
+        if (value > 0) {
+            setIsMuted(false);
+        }
+    };
 
-    if (isMuted) {
-        soundRef.current.volume(volume || 1);
-        setIsMuted(false);
-    } else {
-        soundRef.current.volume(0);
-        setIsMuted(true);
-    }
-};
+    // =========================================================
+    // MUTE
+    // =========================================================
+
+    const toggleMute = () => {
+
+        if (!soundRef.current) {
+            return;
+        }
+
+        if (isMuted) {
+
+            soundRef.current.volume(
+                volume || 1
+            );
+
+            setIsMuted(false);
+
+        } else {
+
+            soundRef.current.volume(0);
+
+            setIsMuted(true);
+        }
+    };
+
+    // =========================================================
+    // REPEAT
+    // =========================================================
 
     const toggleRepeat = () => {
-    setRepeatMode((currentMode) => {
 
-        let nextMode;
+        setRepeatMode(
+            (currentMode) => {
 
-        if (currentMode === "off") {
-            nextMode = "all";
-        } else if (currentMode === "all") {
-            nextMode = "one";
-        } else {
-            nextMode = "off";
-        }
+                let nextMode;
 
-        repeatModeRef.current = nextMode;
+                if (
+                    currentMode === "off"
+                ) {
 
-        return nextMode;
-    });
-};
+                    nextMode = "all";
 
-const toggleShuffle = () => {
-    setIsShuffle(current => {
-        const next = !current;
+                } else if (
+                    currentMode === "all"
+                ) {
 
-        isShuffleRef.current = next;
+                    nextMode = "one";
 
-        if (!next) {
-            shuffleHistoryRef.current = [];
-        } else {
-            shuffleHistoryRef.current = [];
-        }
+                } else {
 
-        console.log("Shuffle changed:", next);
+                    nextMode = "off";
+                }
 
-        return next;
-    });
-};
+                repeatModeRef.current =
+                    nextMode;
 
-    // Cleanup
-    useEffect(() => {
-        return () => {
-            if (soundRef.current) {
-                soundRef.current.stop();
-                soundRef.current.unload();
+                return nextMode;
             }
+        );
+    };
+
+    // =========================================================
+    // SHUFFLE
+    // =========================================================
+
+    const toggleShuffle = () => {
+
+        setIsShuffle(
+            (current) => {
+
+                const next =
+                    !current;
+
+                isShuffleRef.current =
+                    next;
+
+                shuffleHistoryRef.current =
+                    [];
+
+                shufflePositionRef.current =
+                    -1;
+
+                console.log(
+                    "Shuffle changed:",
+                    next
+                );
+
+                return next;
+            }
+        );
+    };
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
+    useEffect(() => {
+
+        return () => {
+
+            soundRef.current = null;
+
+            // Stop and unload ALL Howler instances
+            Howler.stop();
+            Howler.unload();
         };
+
     }, []);
 
+    // =========================================================
+    // RETURN
+    // =========================================================
+
     return {
-    isPlaying,
-    currentSong,
 
-    currentTime,
-    duration,
+        isPlaying,
+        currentSong,
 
-    playlist,
-    currentIndex,
+        currentTime,
+        duration,
 
-    volume,
-    isMuted,
+        playlist,
+        currentIndex,
 
-    repeatMode,
-    isShuffle,
+        volume,
+        isMuted,
 
-    playSong,
-    pauseSong,
-    resumeSong,
-    togglePlayPause,
+        repeatMode,
+        isShuffle,
 
-    playNextSong,
-    playPreviousSong,
+        playSong,
+        pauseSong,
+        resumeSong,
+        togglePlayPause,
 
-    seekTo,
+        playNextSong,
+        playPreviousSong,
 
-    changeVolume,
-    toggleMute,
+        seekTo,
 
-    toggleRepeat,
-    toggleShuffle
+        changeVolume,
+        toggleMute,
+
+        toggleRepeat,
+        toggleShuffle
     };
 };
 

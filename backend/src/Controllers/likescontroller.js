@@ -81,9 +81,61 @@ async function unlikeSong(req,res){
     }
 }
 
+// Get all songs liked by the logged-in user
+async function getMyLikedSongs(req, res) {
+    try {
+        const userId = req.user.id;
+
+        const likes = await likesmodel
+            .find({ user: userId })
+            .populate({
+                path: "song",
+                populate: {
+                    path: "uploadedBy",
+                    select: "username"
+                }
+            })
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            message: "Liked songs retrieved successfully",
+            likes
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+// Get total likes for a song
+async function getLikeCount(req, res) {
+    try {
+        const songId = req.params.id;
+
+        if (!songId) {
+            return res.status(400).json({
+                message: "Song ID is required"
+            });
+        }
+
+        const count = await likesmodel.countDocuments({
+            song: songId
+        });
+
+        return res.status(200).json({ count });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
 module.exports={
     likeSong,
     getlikes,
     unlikeSong,
-    getLikeStatus
+    getMyLikedSongs,
+    getLikeStatus,
+    getLikeCount
 }

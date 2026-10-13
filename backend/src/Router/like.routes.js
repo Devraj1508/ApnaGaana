@@ -4,6 +4,8 @@ const likescontroller = require("../Controllers/likescontroller");
 const middleware = require("../middleware/middleware");
 
 likesrouter.post("/like/:id", middleware, likescontroller.likeSong);
+likesrouter.get("/like-count/:id", middleware, likescontroller.getLikeCount);
+likesrouter.get("/my-likes", middleware, likescontroller.getMyLikedSongs);
 likesrouter.get("/likes/:id", middleware, likescontroller.getlikes);
 likesrouter.get("/like-status/:id", middleware, likescontroller.getLikeStatus);
 likesrouter.delete("/unlike/:id", middleware, likescontroller.unlikeSong);

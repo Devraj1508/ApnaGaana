@@ -6,7 +6,10 @@ const storage=multer.memoryStorage();
 const upload=multer({storage:storage});
 const middleware=require('../middleware/middleware');
 
-Songsrouter.post('/upload',upload.single('file'),middleware,songscontroller.uploadSong);
+Songsrouter.post('/upload', upload.fields([
+        { name: 'file', maxCount: 1 },
+        { name: 'cover', maxCount: 1 }
+    ]),middleware,songscontroller.uploadSong);
 Songsrouter.get('/all',songscontroller.getAllSongs);
 Songsrouter.get('/song/:id',songscontroller.getSongsByUser);
 Songsrouter.get('/search',middleware,songscontroller.searchSongs);

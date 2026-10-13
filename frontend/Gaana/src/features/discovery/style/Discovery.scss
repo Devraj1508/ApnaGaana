@@ -237,3 +237,25 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+.like-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px;
+}
+
+.like-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.like-button.liked {
+    transform: scale(1.05);
+}
+
+.like-error {
+    color: #e74c3c;
+    font-size: 12px;
+}

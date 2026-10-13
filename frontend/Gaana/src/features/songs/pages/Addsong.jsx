@@ -12,11 +12,11 @@ function Addsong() {
     const [formData, setFormData] = useState({
         title: "",
         artist: "",
-        cover: "",
         duration: ""
     });
 
     const [audioFile, setAudioFile] = useState(null);
+    const [coverFile, setCoverFile] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -31,6 +31,10 @@ function Addsong() {
         setAudioFile(e.target.files[0]);
     };
 
+    const handleCoverChange = (e) => {
+    setCoverFile(e.target.files[0]);
+};
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -43,8 +47,8 @@ function Addsong() {
 
         data.append("title", formData.title);
         data.append("artist", formData.artist);
-        data.append("cover", formData.cover);
         data.append("duration", formData.duration);
+        data.append("cover", coverFile);
 
         // Backend me upload.single("file") hai
         data.append("file", audioFile);
@@ -102,17 +106,7 @@ function Addsong() {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Cover Image URL</label>
-
-                        <input
-                            type="text"
-                            name="cover"
-                            value={formData.cover}
-                            onChange={handleChange}
-                            placeholder="Enter cover image URL"
-                        />
-                    </div>
+                    
 
                     <div className="form-group">
                         <label>Duration</label>
@@ -135,6 +129,17 @@ function Addsong() {
                             type="file"
                             accept="audio/*"
                             onChange={handleFileChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Cover Image</label>
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCoverChange}
                             required
                         />
                     </div>
