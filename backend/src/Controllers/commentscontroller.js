@@ -7,14 +7,15 @@ async function addComment(req,res){
         const userId=req.user.id;
         const songId=req.params.id;
         const {comment}=req.body;
-        if(!comment){
+        if(typeof comment !== "string" || !comment.trim()){
             return res.status(400).json({error:"Comment is required"});
         }
         const newComment = await commentsmodel.create({
             user: userId,
             song: songId,
-            comment: comment
+            comment: comment.trim()
         });
+        await newComment.populate("user", "username profilePicture");
         res.status(201).json({message:"Comment added successfully", comment: newComment});
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -28,7 +29,10 @@ async function getComments(req,res){
         if(!songId){
             return res.status(400).json({error:"Song ID is required"});
         }
-        const comments = await commentsmodel.find({ song: songId }).populate('user', 'name email');
+        const comments = await commentsmodel
+            .find({ song: songId })
+            .sort({ createdAt: -1 })
+            .populate('user', 'username profilePicture');
         res.status(200).json({message:"Comments retrieved successfully", comments: comments});
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -73,7 +77,7 @@ async function updateComment(req,res){
         if(!userId){
             return res.status(400).json({error:"User ID is required"});
         }
-        if(!comment){
+        if(typeof comment !== "string" || !comment.trim()){
             return res.status(400).json({error:"Comment is required"});
         }
         const existingComment = await commentsmodel.findById(commentId);
@@ -83,7 +87,9 @@ async function updateComment(req,res){
         if(existingComment.user.toString() !== userId){
             return res.status(403).json({error:"You are not the owner of this comment"});
         }
-        const updatedComment = await commentsmodel.findByIdAndUpdate(commentId, { comment: comment }, { new: true });
+        const updatedComment = await commentsmodel
+            .findByIdAndUpdate(commentId, { comment: comment.trim() }, { new: true })
+            .populate("user", "username profilePicture");
         res.status(200).json({message:"Comment updated successfully", comment: updatedComment});
     } catch (error) {
         res.status(500).json({error: error.message});

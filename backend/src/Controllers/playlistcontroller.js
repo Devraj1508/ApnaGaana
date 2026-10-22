@@ -1,5 +1,8 @@
+const mongoose = require("mongoose");
 const playlistmodel = require('../models/playlistmodels');
 const songmodel = require('../models/songsmodel');
+
+const isValidObjectId = (id) => mongoose.isValidObjectId(id);
 
 async function createPlaylist(req,res){
     try{
@@ -40,11 +43,11 @@ async function addSongToPlaylist(req,res){
         const playlistId=req.params.id;
         const {songId}=req.body || {};
 
-        if(!playlistId || playlistId.trim() === ''){
+        if(!isValidObjectId(playlistId)){
             return res.status(400).json({message: "Playlist ID is required"});
         }
 
-        if(!songId || songId.trim() === ''){
+        if(!isValidObjectId(songId)){
             return res.status(400).json({message: "Song ID is required"});
         }
         const playlist = await playlistmodel.findById(playlistId);
@@ -53,7 +56,7 @@ async function addSongToPlaylist(req,res){
         }
 
         // Check if the user is the owner of the playlist
-        if(playlist.user.toString() !== userId){
+        if(String(playlist.user) !== String(userId)){
             return res.status(403).json({message: "You are not the owner of this playlist"});
         }
 
@@ -100,14 +103,14 @@ try{
     const userId=req.user.id;
     const playlistId=req.params.id;
 
-    if(!playlistId || playlistId.trim() === ''){
+    if(!isValidObjectId(playlistId)){
         return res.status(400).json({message: "Playlist ID is required"});
     }   
     const playlist = await playlistmodel.findById(playlistId);
     if(!playlist){
         return res.status(404).json({message: "Playlist not found"});
     } 
-    if(playlist.user.toString() !== userId){
+    if(String(playlist.user) !== String(userId)){
     return res.status(403).json({
         message: "You are not the owner of this playlist"
     });
@@ -127,11 +130,11 @@ async function removeSongFromPlaylist(req,res){
         const playlistId=req.params.id;
         const {songId}=req.body || {};
 
-        if(!playlistId || playlistId.trim() === ''){
+        if(!isValidObjectId(playlistId)){
             return res.status(400).json({message: "Playlist ID is required"});
         }
 
-        if(!songId || songId.trim() === ''){
+        if(!isValidObjectId(songId)){
             return res.status(400).json({message: "Song ID is required"});
         }
 
@@ -141,7 +144,7 @@ async function removeSongFromPlaylist(req,res){
         }
 
         // Check if the user is the owner of the playlist
-        if(playlist.user.toString() !== userId){
+        if(String(playlist.user) !== String(userId)){
             return res.status(403).json({message: "You are not the owner of this playlist"});
         }
 
@@ -169,16 +172,22 @@ async function getPlaylistById(req,res){
         const userId=req.user.id;
         const playlistId=req.params.id;
 
-        if (!playlistId || playlistId.trim() === "") {
+        if (!isValidObjectId(playlistId)) {
             return res.status(400).json({
                 message: "Playlist ID is required"
             });
         }
-        const playlist = await playlistmodel.findById(playlistId).populate('songs');
+        const playlist = await playlistmodel.findById(playlistId).populate({
+        path: "songs",
+        populate: {
+        path: "uploadedBy",
+        select: "username"
+    }
+});
         if(!playlist){
             return res.status(404).json({message: "Playlist not found"});
         }
-        if(playlist.user.toString() !== userId){
+        if(String(playlist.user) !== String(userId)){
             return res.status(403).json({message: "You are not the owner of this playlist"});
         }
         res.status(200).json({message: "Playlist retrieved successfully", playlist});
@@ -195,7 +204,7 @@ async function updatePlaylist(req,res){
         const playlistId=req.params.id;
         const {name,description,covers}=req.body;
 
-        if(!playlistId || playlistId.trim() === ''){
+        if(!isValidObjectId(playlistId)){
             return res.status(400).json({message: "Playlist ID is required"});
         }
 
@@ -204,7 +213,7 @@ async function updatePlaylist(req,res){
             return res.status(404).json({message: "Playlist not found"});
         }
 
-        if(playlist.user.toString() !== userId){
+        if(String(playlist.user) !== String(userId)){
             return res.status(403).json({message: "You are not the owner of this playlist"});
         }
 

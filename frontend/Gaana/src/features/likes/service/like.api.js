@@ -23,3 +23,8 @@ export const getMyLikedSongs = async () => {
     const response = await api.get("/likes/my-likes");
     return response.data;
 };
+// Get total likes for a song
+export const getLikeCount = async (songId) => {
+    const response = await api.get(`/likes/like-count/${songId}`);
+    return response.data;
+};

@@ -1,0 +1,174 @@
+.profile-page {
+    min-height: 100vh;
+    padding: 2rem;
+    background: #0f0f0f;
+    color: #ffffff;
+}
+
+.profile-back-button {
+    margin-bottom: 1.5rem;
+    border: none;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 0.95rem;
+
+    &:hover {
+        color: #1db954;
+    }
+}
+
+.profile-header-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #282828, #181818);
+}
+
+.profile-avatar {
+    display: flex;
+    flex: 0 0 110px;
+    align-items: center;
+    justify-content: center;
+    width: 110px;
+    height: 110px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #1db954;
+    color: #ffffff;
+    font-size: 3rem;
+    font-weight: 700;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.profile-summary {
+    flex: 1;
+
+    h1 {
+        margin: 0.2rem 0 0.5rem;
+        font-size: 2.5rem;
+    }
+
+    p {
+        margin: 0 0 0.6rem;
+        color: #bbb;
+    }
+
+    span,
+    .profile-eyebrow {
+        color: #1db954;
+        font-size: 0.85rem;
+    }
+}
+
+.profile-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.profile-edit-button,
+.profile-edit-actions button {
+    border: none;
+    border-radius: 999px;
+    background: #1db954;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.profile-edit-button {
+    padding: 0.75rem 1.25rem;
+}
+
+.profile-edit-form {
+    max-width: 620px;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: #181818;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 1rem;
+        color: #aaa;
+        font-size: 0.85rem;
+    }
+
+    input,
+    textarea {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #242424;
+        color: #ffffff;
+        font: inherit;
+        resize: vertical;
+
+        &:focus {
+            border-color: #1db954;
+            outline: none;
+        }
+    }
+}
+
+.profile-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.7rem;
+
+    button {
+        padding: 0.7rem 1rem;
+    }
+
+    button:first-child {
+        background: #444;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.profile-error {
+    color: #ff8b8b;
+}
+
+.profile-songs-section h2 {
+    margin-bottom: 1rem;
+}
+
+.profile-empty-state {
+    color: #888;
+}
+
+@media (max-width: 600px) {
+    .profile-page {
+        padding: 1rem;
+    }
+
+    .profile-header-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .profile-summary h1 {
+        font-size: 2rem;
+    }
+}

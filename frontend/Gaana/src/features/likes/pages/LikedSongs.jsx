@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { getMyLikedSongs } from "../service/like.api";
 import SongCard from "../../discovery/components/SongCard";
+import "../style/likedsong.scss";
 
 function LikedSongs() {
     const [likedSongs, setLikedSongs] = useState([]);
@@ -44,39 +45,68 @@ function LikedSongs() {
     }
 
     if (error) {
-        return <div className="liked-songs-page">{error}</div>;
+        return (
+            <div className="liked-songs-page">
+                <p className="liked-songs-error">{error}</p>
+                <button
+                    type="button"
+                    className="back-button"
+                    onClick={() => navigate("/")}
+                >
+                    Back to Discover
+                </button>
+            </div>
+        );
     }
 
     return (
         <div className="liked-songs-page">
-            <button onClick={() => navigate(-1)}>
+            <button
+                type="button"
+                className="back-button"
+                onClick={() => navigate(-1)}
+            >
                 ← Back
             </button>
 
-            <h1>❤️ Liked Songs</h1>
-            <p>{likedSongs.length} songs</p>
+            <div className="liked-songs-header">
+                <div className="liked-songs-icon" aria-hidden="true">
+                    ❤️
+                </div>
+                <div>
+                    <p>Collection</p>
+                    <h1>Liked Songs</h1>
+                    <span>{likedSongs.length} songs</span>
+                </div>
+            </div>
 
             {likedSongs.length === 0 ? (
-                <p>You haven't liked any songs yet.</p>
-            ) : (
-                <div className="song-grid">
-                    {likedSongs.map((song) => (
-                        <SongCard
-                            key={song._id}
-                            song={song}
-                            songs={likedSongs}
-                            title={song.title}
-                            artist={song.uploadedBy?.username}
-                            image={song.cover}
-                            audio={song.audio}
-                            onUnlike={(songId) => {
-                                    setLikedSongs((prev) =>
-                                    prev.filter((item) => item._id !== songId)
-                                             );
-                                            }}
-                        />
-                    ))}
+                <div className="liked-songs-empty">
+                    <p>You haven't liked any songs yet.</p>
                 </div>
+            ) : (
+                <section className="liked-songs-list">
+                    <h2>All liked songs</h2>
+                    <div className="liked-song-grid">
+                        {likedSongs.map((song) => (
+                            <div className="liked-song-card" key={song._id}>
+                                <SongCard
+                                    song={song}
+                                    songs={likedSongs}
+                                    title={song.title}
+                                    artist={song.artist || song.uploadedBy?.username}
+                                    image={song.cover || song.coverImage}
+                                    audio={song.audio}
+                                    onUnlike={(songId) => {
+                                        setLikedSongs((prev) =>
+                                            prev.filter((item) => item._id !== songId)
+                                        );
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </section>
             )}
         </div>
     );

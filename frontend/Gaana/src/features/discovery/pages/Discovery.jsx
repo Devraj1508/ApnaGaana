@@ -1,4 +1,6 @@
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../../app/context/Authcontext";
 import SongCard from "../components/SongCard";
 import useDiscovery from "../hooks/useDiscovery";
 import MusicPlayer from "../../songs/components/MusicPlayer";
@@ -9,10 +11,47 @@ function Discovery() {
     const {
         discoveryData,
         loading,
-        error
+        error,
+        searchLoading,
+        searchResults,
+        searchError,
+        hasSearched,
+        findSongs,
+        clearSearch,
+        replaceSong,
+        removeSong
     } = useDiscovery();
 
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchTimerRef = useRef(null);
+    const { user } = useAuthContext();
     const navigate = useNavigate();
+
+    const handleSearchQueryChange = (event) => {
+        const nextQuery = event.target.value;
+        setSearchQuery(nextQuery);
+
+        if (searchTimerRef.current) {
+            clearTimeout(searchTimerRef.current);
+        }
+
+        if (!nextQuery.trim()) {
+            clearSearch();
+            return;
+        }
+
+        searchTimerRef.current = setTimeout(() => {
+            findSongs(nextQuery);
+        }, 350);
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery("");
+        clearSearch();
+        if (searchTimerRef.current) {
+            clearTimeout(searchTimerRef.current);
+        }
+    };
 
     if (loading) {
         return (
@@ -49,7 +88,17 @@ function Discovery() {
               </button>
 
 
-                <button className="profile-button">
+                <button
+                    type="button"
+                    className="profile-button"
+                    onClick={() => {
+                        const userId = user?._id || user?.id;
+                        if (userId) {
+                            navigate(`/profile/${userId}`);
+                        }
+                    }}
+                    disabled={!user?._id && !user?.id}
+                >
                     Profile
                 </button>
             </div>
@@ -57,16 +106,61 @@ function Discovery() {
 
             {/* Search */}
             <div className="search-section">
+                <span className="search-icon" aria-hidden="true">⌕</span>
                 <input
                     type="text"
-                    placeholder="Search songs, artists..."
+                    value={searchQuery}
+                    onChange={handleSearchQueryChange}
+                    placeholder="What do you want to play?"
+                    aria-label="Search songs, artists, and albums"
                 />
 
-                <button>
-                    Search
-                </button>
+                {searchQuery && (
+                    <button
+                        type="button"
+                        className="clear-search-button"
+                        onClick={handleClearSearch}
+                        aria-label="Clear search"
+                    >
+                        ×
+                    </button>
+                )}
             </div>
 
+            {hasSearched && (
+                <section className="discovery-section search-results-section">
+                    <div className="search-results-heading">
+                        <h2>Search results for “{searchQuery}”</h2>
+                        {searchLoading && <span>Searching...</span>}
+                    </div>
+
+                    {searchError && <p className="search-message search-error">{searchError}</p>}
+
+                    {!searchError && !searchLoading && searchResults.length === 0 && (
+                        <p className="search-message">No songs found. Try another title or artist.</p>
+                    )}
+
+                    {searchResults.length > 0 && !searchLoading && (
+                        <div className="search-song-list">
+                            {searchResults.map((song) => (
+                                <div className="search-song-item" key={song._id}>
+                                    <SongCard
+                                    key={song._id}
+                                    song={song}
+                                    songs={searchResults}
+                                    title={song.title}
+                                    artist={song.artist || song.uploadedBy?.username}
+                                    image={song.cover}
+                                    audio={song.audio}
+                                    onSongUpdated={replaceSong}
+                                    onSongDeleted={removeSong}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
 
             {/* Quick Access */}
             <section className="discovery-section">
@@ -75,23 +169,45 @@ function Discovery() {
 
                 <div className="category-grid">
 
-                    <div className="category-card">
+                    <div
+                    className="category-card"
+                    onClick={() => navigate("/liked-songs")}>
                         <span>❤️</span>
                         <h3>Liked Songs</h3>
                         <p>Your favourite songs</p>
                     </div>
 
-                    <div className="category-card">
+                    <div
+                    className="category-card"
+                    onClick={() => navigate("/recently-played")}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            navigate("/recently-played");
+                        }
+                    }}>
                         <span>🕒</span>
                         <h3>Recently Played</h3>
                         <p>Listen again</p>
                     </div>
 
-                    <div className="category-card">
-                        <span>🎵</span>
-                        <h3>Playlists</h3>
-                        <p>Your playlists</p>
-                    </div>
+           <div
+           className="category-card"
+            onClick={() => navigate("/playlists")}
+           role="button"
+           tabIndex={0}
+           onKeyDown={(e) => {
+            if (e.key === "Enter") {
+            navigate("/playlists");
+                }
+           }}
+          >
+            <span>🎵</span>
+            <h3>Playlists</h3>
+           <p>Your playlists</p>
+            </div>
+
 
                 </div>
 
@@ -112,9 +228,11 @@ function Discovery() {
                         song={song}
                         songs={discoveryData.latestSongs}
                         title={song.title}
-                        artist={song.uploadedBy?.username}
+                        artist={song.artist || song.uploadedBy?.username}
                         image={song.cover}
                         audio={song.audio}
+                        onSongUpdated={replaceSong}
+                        onSongDeleted={removeSong}
                            />
 
                     ))}
@@ -138,9 +256,11 @@ function Discovery() {
                         song={song}
                         songs={discoveryData.popularSongs}
                         title={song.title}
-                        artist={song.uploadedBy?.username}
+                        artist={song.artist || song.uploadedBy?.username}
                         image={song.cover}
                         audio={song.audio}
+                        onSongUpdated={replaceSong}
+                        onSongDeleted={removeSong}
                         />
 
                     ))}
@@ -155,7 +275,7 @@ function Discovery() {
 
                 <h2>Recently Played</h2>
 
-                <div className="song-grid">
+                <div className="song-grid recently-played-grid">
 
                     {discoveryData?.recentlyPlayed?.map((song) => (
 
@@ -164,9 +284,11 @@ function Discovery() {
                         song={song}
                         songs={discoveryData.recentlyPlayed}
                         title={song.title}
-                        artist={song.uploadedBy?.username}
+                        artist={song.artist || song.uploadedBy?.username}
                         image={song.cover}
                         audio={song.audio}
+                        onSongUpdated={replaceSong}
+                        onSongDeleted={removeSong}
                         />
 
                     ))}

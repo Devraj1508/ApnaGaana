@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMusicContext } from "../../../app/context/MusicContext";
+import Comments from "../../comments/components/Comments";
 import "../style/Song_Details.scss";
 
 function SongDetails() {
@@ -299,6 +300,8 @@ function SongDetails() {
                 </div>
 
             </div>
+
+            <Comments songId={displaySong._id} />
 
         </div>
     );

@@ -29,3 +29,9 @@ export const deleteSong = async (id) => {
 
     return response.data;
 };
+
+export const updateSong = async (id, formData) => {
+    const response = await api.put(`/songs/song/${id}`, formData);
+
+    return response.data;
+};

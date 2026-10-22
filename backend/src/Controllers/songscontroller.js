@@ -62,13 +62,22 @@ res.status(200).json({ message: "Song uploaded successfully", song });
 }
 
 // get all songs
-async function getAllSongs(req,res){
-    try{
-        const songs=await songmodel.find().populate('uploadedBy','username profilePicture');
-        res.status(200).json({songs});
-    }catch(error){
+async function getAllSongs(req, res) {
+    try {
+        const songs = await songmodel
+            .find()
+            .populate("uploadedBy", "username");
+
+        return res.status(200).json({
+            message: "Songs fetched successfully",
+            songs
+        });
+    } catch (error) {
         console.error("Error fetching songs:", error);
-        res.status(500).json({ error: "Error fetching songs" });
+
+        return res.status(500).json({
+            message: "Failed to fetch songs"
+        });
     }
 }
 
@@ -111,28 +120,42 @@ async function getSongById(req,res){
 async function updateSong(req,res){
     try{
         const songId=req.params.id;
-        const {title,artist,cover,duration}=req.body;
+        const {title,artist,duration}=req.body;
 
         const song=await songmodel.findById(songId)
         if(!song){
             return res.status(404).json({error:"Song not found"});
         }
-        if(req.user.id.toString() !== song.uploadedBy.toString()){
+        const isOwner = req.user.id.toString() === song.uploadedBy.toString();
+
+        if(!isOwner){
             return res.status(403).json({error:"You are not authorized to update this song"});
         }
-        if(title!==undefined){
-            song.title=title;
+        if (title !== undefined) {
+            if (typeof title !== "string" || !title.trim()) {
+                return res.status(400).json({ error: "Song title is required" });
+            }
+            song.title = title.trim();
         }
-        if(artist!==undefined){
-            song.artist=artist;
+        if (artist !== undefined) {
+            if (typeof artist !== "string" || !artist.trim()) {
+                return res.status(400).json({ error: "Singer name is required" });
+            }
+            song.artist = artist.trim();
         }
-        if(cover!==undefined){
-            song.cover=cover;
+        if (req.file) {
+            const coverUpload = await client.files.upload({
+                file: await toFile(Buffer.from(req.file.buffer), 'cover'),
+                fileName: req.file.originalname,
+                folder: 'dev-apna-gaana/covers'
+            });
+            song.cover = coverUpload.url;
         }
         if(duration!==undefined){
             song.duration=duration;
         }
         await song.save();
+        await song.populate("uploadedBy", "username profilePicture");
         res.status(200).json({song});
     }catch(error){
         console.error("Error updating song:", error);
@@ -200,4 +223,3 @@ async function searchSongs(req,res){
 module.exports = {
     uploadSong,getAllSongs,getSongsByUser,getSongById,updateSong,deleteSong,getMySongs,searchSongs
 };
-

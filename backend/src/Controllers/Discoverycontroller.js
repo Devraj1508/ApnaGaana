@@ -2,6 +2,27 @@ const songsmodel = require("../models/songsmodel");
 const listeninghistorymodel = require("../models/listeninghistorymodel");
 const likesmodel = require("../models/likemodel");
 
+function getUniqueSongs(history, limit) {
+    const seenSongs = new Set();
+    const uniqueSongs = [];
+
+    for (const record of history) {
+        const songId = record.song?._id?.toString();
+
+        if (!songId || seenSongs.has(songId)) {
+            continue;
+        }
+
+        seenSongs.add(songId);
+        uniqueSongs.push(record.song);
+
+        if (uniqueSongs.length === limit) {
+            break;
+        }
+    }
+
+    return uniqueSongs;
+}
 
 async function getDiscoveryData(req,res){
     try{
@@ -37,7 +58,6 @@ async function getDiscoveryData(req,res){
         //recently played songs by the user
         const recentlyplayed=await listeninghistorymodel.find({user:userId})
         .sort({listenedAt:-1})
-        .limit(10)
         .populate('song')
         .populate('song.uploadedBy','username profilePicture');
 
@@ -45,7 +65,7 @@ async function getDiscoveryData(req,res){
             message:"Discovery data retrieved successfully",
             latestSongs,
             popularSongs:popularSongsData,
-            recentlyPlayed:recentlyplayed.map(record=>record.song)
+            recentlyPlayed:getUniqueSongs(recentlyplayed, 10)
         });
     }catch(error){
         console.error("Error retrieving discovery data:", error);

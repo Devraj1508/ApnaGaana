@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Howl, Howler } from "howler";
+import api from "../../../core/api/axios";
 
 const useMusic = () => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -184,6 +185,17 @@ const useMusic = () => {
 
                 if (soundRef.current === sound) {
                     setIsPlaying(true);
+                }
+
+                if (typeof song._id === "string") {
+                    api.post("/listening-history/record", {
+                        songId: song._id
+                    }).catch((error) => {
+                        console.error(
+                            "Failed to record listening history:",
+                            error
+                        );
+                    });
                 }
             },
 

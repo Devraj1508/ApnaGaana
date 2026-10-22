@@ -1,5 +1,20 @@
 const listeninghistorymodel = require('../models/listeninghistorymodel');
 
+function getUniqueHistory(history) {
+    const seenSongs = new Set();
+
+    return history.filter((record) => {
+        const songId = record.song?._id?.toString();
+
+        if (!songId || seenSongs.has(songId)) {
+            return false;
+        }
+
+        seenSongs.add(songId);
+        return true;
+    });
+}
+
 async function recordsongplay(req,res){
     try{
         const userId=req.user.id;
@@ -27,8 +42,14 @@ async function getlisteninghistory(req,res){
         if(!userId || userId.trim() === ''){
             return res.status(400).json({message: "User ID is required"});
         }
-        const history=await listeninghistorymodel.find({user:userId}).populate('song').sort({listenedAt:-1});
-        res.status(200).json({message:"Listening history retrieved successfully", history});
+        const history=await listeninghistorymodel
+            .find({user:userId})
+            .populate('song')
+            .sort({listenedAt:-1});
+        res.status(200).json({
+            message:"Listening history retrieved successfully",
+            history:getUniqueHistory(history)
+        });
     } catch(error){
         console.error("Error retrieving listening history:", error);
         res.status(500).json({message: error.message});

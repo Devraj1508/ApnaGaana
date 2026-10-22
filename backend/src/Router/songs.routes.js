@@ -14,7 +14,7 @@ Songsrouter.get('/all',songscontroller.getAllSongs);
 Songsrouter.get('/song/:id',songscontroller.getSongsByUser);
 Songsrouter.get('/search',middleware,songscontroller.searchSongs);
 Songsrouter.get('/songbyid/:id',songscontroller.getSongById);
-Songsrouter.put('/song/:id',middleware,songscontroller.updateSong);
+Songsrouter.put('/song/:id', upload.single('cover'), middleware, songscontroller.updateSong);
 Songsrouter.delete('/song/:id',middleware,songscontroller.deleteSong);
 Songsrouter.get('/mysongs',middleware,songscontroller.getMySongs);
 module.exports=Songsrouter;
