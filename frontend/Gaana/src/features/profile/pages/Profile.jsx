@@ -7,6 +7,7 @@ import {
     getUserSongs,
     updateUserProfile
 } from "../service/profile.api";
+import "../../discovery/style/Discovery.scss";
 import "../style/profile.scss";
 
 const getUserId = (user) => user?._id || user?.id;

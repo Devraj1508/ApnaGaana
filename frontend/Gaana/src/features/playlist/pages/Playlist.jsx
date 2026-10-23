@@ -273,6 +273,7 @@ function Playlist() {
                                 <div className="playlist-actions">
                                     <button
                                         type="button"
+                                        className="playlist-edit-button"
                                         onClick={(e) => {
                                             e.stopPropagation();
 
@@ -283,8 +284,16 @@ function Playlist() {
                                                 covers: playlist.covers || []
                                             });
                                         }}
+                                        aria-label={`Edit ${playlist.name}`}
+                                        title={`Edit ${playlist.name}`}
                                     >
-                                        Edit
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            aria-hidden="true"
+                                            focusable="false"
+                                        >
+                                            <path d="M4 16.5V20h3.5L18.8 8.7l-3.5-3.5L4 16.5Zm16.7-10.3c.4-.4.4-1 0-1.4l-1.5-1.5a1 1 0 0 0-1.4 0l-1.7 1.7 3.5 3.5 1.1-1.1Z" />
+                                        </svg>
                                     </button>
 
                                     <button

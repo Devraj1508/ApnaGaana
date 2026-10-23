@@ -26,7 +26,9 @@ function SongCard({
     songs,
     onUnlike,
     onSongUpdated,
-    onSongDeleted
+    onSongDeleted,
+    showUploaderProfile = true,
+    showEditButton = false
 }) {
     const navigate = useNavigate();
     const { user } = useAuthContext();
@@ -150,7 +152,7 @@ function SongCard({
             className="song-card"
             onClick={handleCardClick}
         >
-            {canEditDetails && !isEditing && (
+            {(canEditDetails || showEditButton) && !isEditing && (
                 <button
                     type="button"
                     className="edit-song-button"
@@ -285,51 +287,51 @@ function SongCard({
                 <p>{cardSong.artist || artist}</p>
             </div>
 
-            {uploadedById && (
+            <div className="song-card-actions">
                 <button
                     type="button"
-                    className="uploader-profile-button"
+                    className="play-button"
                     onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/profile/${uploadedById}`);
+
+                        playSong(song, songs);
+
+                        navigate(`/song/${song._id}`, {
+                            state: {
+                                song,
+                                songs
+                            }
+                        });
                     }}
                 >
-                    {canEditDetails ? "Your profile" : "View profile"}
+                    {currentSong?._id === song?._id && isPlaying
+                        ? "❚❚"
+                        : "▶"}
                 </button>
-            )}
 
-            {/* PLAY BUTTON */}
-            <button
-                type="button"
-                className="play-button"
-                onClick={(e) => {
-                    e.stopPropagation();
+                <button
+                    type="button"
+                    className={`like-button ${isLiked ? "liked" : ""}`}
+                    onClick={handleLikeClick}
+                    disabled={likeLoading}
+                    aria-label={isLiked ? "Unlike song" : "Like song"}
+                >
+                    {isLiked ? "❤️" : "🤍"} <span className="like-count">{likeCount}</span>
+                </button>
 
-                    playSong(song, songs);
-
-                    navigate(`/song/${song._id}`, {
-                        state: {
-                            song,
-                            songs
-                        }
-                    });
-                }}
-            >
-                {currentSong?._id === song?._id && isPlaying
-                    ? "❚❚"
-                    : "▶"}
-            </button>
-
-            {/* LIKE BUTTON */}
-            <button
-                type="button"
-                className={`like-button ${isLiked ? "liked" : ""}`}
-                onClick={handleLikeClick}
-                disabled={likeLoading}
-                aria-label={isLiked ? "Unlike song" : "Like song"}
-            >
-                {isLiked ? "❤️" : "🤍"} <span className="like-count">{likeCount}</span>
-            </button>
+                {showUploaderProfile && uploadedById && (
+                    <button
+                        type="button"
+                        className="uploader-profile-button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${uploadedById}`);
+                        }}
+                    >
+                        {canEditDetails ? "Your profile" : "View profile"}
+                    </button>
+                )}
+            </div>
 
             {likeError && (
                 <p className="like-error">{likeError}</p>

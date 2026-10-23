@@ -23,86 +23,86 @@ APNA GAANA
 │   └── Check Follow Status 
 │
 ├── 🎵 SONGS -->done
-│   ├── Upload Song
-│   ├── Get All Songs
-│   ├── Get Single Song
-│   ├── Update Song
-│   ├── Delete Song
-│   ├── Get My Songs
-│   ├── Get Artist Songs
-│   ├── Song Details
-│   └── Play Count
+│   ├── Upload Song ^
+│   ├── Get All Songs ^
+│   ├── Get Single Song ^
+│   ├── Update Song ^
+│   ├── Delete Song ^
+│   ├── Get My Songs ^
+│   ├── Get Artist Songs ^
+│   ├── Song Details ^
+│   └── Play Count ^
 │
 ├── 🎤 ARTISTS -->done
-│   ├── Create Artist Profile
-│   ├── Get Artist
-│   ├── Update Artist
-│   ├── Artist Songs
-│   ├── Artist Albums
-│   └── Follow Artist
+│   ├── Create Artist Profile ^
+│   ├── Get Artist ^
+│   ├── Update Artist ^
+│   ├── Artist Songs ^
+│   ├── Artist Albums ^
+│   └── Follow Artist ^
 │
 ├── ❤️ LIKES  -->done
-│   ├── Like Song
-│   ├── Unlike Song
-│   ├── Get Song Likes
-│   ├── Check Like Status
-│   └── Liked Songs
+│   ├── Like Song ^
+│   ├── Unlike Song ^
+│   ├── Get Song Likes ^
+│   ├── Check Like Status ^
+│   └── Liked Songs ^
 │
 ├── 💬 COMMENTS -->done
-│   ├── Add Comment
-│   ├── Get Comments
-│   ├── Update Comment
-│   ├── Delete Comment
-│   └── Comment Like
+│   ├── Add Comment ^
+│   ├── Get Comments ^
+│   ├── Update Comment ^
+│   ├── Delete Comment ^
+│   └── Comment Like ^
 │
 ├── 📂 PLAYLISTS  -->done
-│   ├── Create Playlist
-│   ├── Get Playlists
-│   ├── Get Single Playlist
-│   ├── Update Playlist
-│   ├── Delete Playlist
-│   ├── Add Song
-│   ├── Remove Song
-│   └── Public / Private Playlist
+│   ├── Create Playlist ^
+│   ├── Get Playlists ^
+│   ├── Get Single Playlist ^
+│   ├── Update Playlist ^
+│   ├── Delete Playlist ^
+│   ├── Add Song ^
+│   ├── Remove Song ^
+│   └── Public / Private Playlist ^
 │
 ├── 🔎 SEARCH  -->done
-│   ├── Search Songs
-│   ├── Search Artists
+│   ├── Search Songs ^
+│   ├── Search Artists ^
 │   ├── Search Users
-│   ├── Search Playlists
-│   └── Global Search
+│   ├── Search Playlists ^
+│   └── Global Search 
 │
 ├── 🏠 HOME / DISCOVERY -->done
-│   ├── Trending Songs
-│   ├── New Releases
-│   ├── Popular Artists
+│   ├── Trending Songs ^
+│   ├── New Releases ^
+│   ├── Popular Artists ^
 │   ├── Recommended Songs
 │   ├── Recommended Artists
 │   └── Social Feed
 │
 ├── 🎧 MUSIC PLAYER
-│   ├── Play
-│   ├── Pause
-│   ├── Next
-│   ├── Previous
-│   ├── Seek
-│   ├── Volume
-│   ├── Queue
-│   ├── Shuffle
-│   ├── Repeat
-│   └── Recently Played
+│   ├── Play ^
+│   ├── Pause ^
+│   ├── Next ^
+│   ├── Previous ^
+│   ├── Seek ^
+│   ├── Volume ^
+│   ├── Queue ^
+│   ├── Shuffle ^
+│   ├── Repeat ^
+│   └── Recently Played ^
 │
 ├── ☁️ MEDIA / STORAGE
-│   ├── Upload Audio
-│   ├── Upload Cover
-│   ├── Upload Profile Image
-│   └── Cloud Storage URLs
+│   ├── Upload Audio ^
+│   ├── Upload Cover ^
+│   ├── Upload Profile Image ^
+│   └── Cloud Storage URLs ^
 │
 ├── 🔔 NOTIFICATIONS
-│   ├── New Follower
-│   ├── Song Like
-│   ├── Comment
-│   └── Playlist Activity
+│   ├── New Follower 
+│   ├── Song Like ^
+│   ├── Comment ^
+│   └── Playlist Activity ^
 │
 └── 🧊 3D / VISUAL EXPERIENCE
     ├── 3D Hero

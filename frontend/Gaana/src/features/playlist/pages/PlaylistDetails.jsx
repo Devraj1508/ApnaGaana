@@ -8,7 +8,13 @@ import {
 } from "../service/playlist.api";
 import SongCard from "../../discovery/components/SongCard";
 import { getAllSongs } from "../../songs/service/song.api";
+import "../../discovery/style/Discovery.scss";
 import "../style/playliststyle.scss";
+
+const getEntityId = (entity) =>
+    typeof entity === "string" || typeof entity === "number"
+        ? entity.toString()
+        : entity?._id || entity?.id;
 
 function PlaylistDetails() {
     const { id } = useParams();
@@ -233,16 +239,30 @@ function PlaylistDetails() {
                                      title={song.title}
                                      artist={song.artist || song.uploadedBy?.username || "Unknown artist"}
                                      image={song.coverImage}
+                                     showUploaderProfile={false}
+                                     showEditButton
                                 />
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        handleRemoveSong(song._id)
-                                    }
-                                >
-                                    Remove
-                                </button>
+                                <div className="playlist-song-actions">
+                                    {getEntityId(song.uploadedBy) && (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                navigate(`/profile/${getEntityId(song.uploadedBy)}`)
+                                            }
+                                        >
+                                            Your profile
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            handleRemoveSong(song._id)
+                                        }
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>

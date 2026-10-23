@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const usermodel = require("../models/usermodel");
+const { blacklistToken } = require("../config/redis");
 
 const cookieOptions = {
   
@@ -108,7 +109,21 @@ async function getMe(req, res) {
 }
 
 //logout
-function logout(req, res) {
+async function logout(req, res) {
+  const token = req.cookies.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      await blacklistToken(token, decoded.exp * 1000);
+    } catch (error) {
+      if (error.name !== "TokenExpiredError" && error.name !== "JsonWebTokenError") {
+        console.error("Token blacklist failed during logout:", error.message);
+        return res.status(503).json({ message: "Authentication service is unavailable" });
+      }
+    }
+  }
+
   res.clearCookie("token", cookieOptions);
   return res.status(200).json({ message: "Logged out successfully" });
 }

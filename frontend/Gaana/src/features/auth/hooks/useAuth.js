@@ -61,6 +61,20 @@ const useAuth = () => {
     };
 
     const logout = async () => {
+        const firstConfirmation = window.confirm(
+            'Are you sure you want to log out?'
+        );
+        if (!firstConfirmation) {
+            return null;
+        }
+
+        const secondConfirmation = window.confirm(
+            'Please confirm again: log out of your account? Your user data will not be deleted.'
+        );
+        if (!secondConfirmation) {
+            return null;
+        }
+
         try{
             setLoading(true);
             setError(null);

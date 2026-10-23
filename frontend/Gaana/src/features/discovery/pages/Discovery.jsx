@@ -24,7 +24,7 @@ function Discovery() {
 
     const [searchQuery, setSearchQuery] = useState("");
     const searchTimerRef = useRef(null);
-    const { user } = useAuthContext();
+    const { user, logout, loading: authLoading } = useAuthContext();
     const navigate = useNavigate();
 
     const handleSearchQueryChange = (event) => {
@@ -74,20 +74,6 @@ function Discovery() {
 
             {/* Header */}
             <div className="discovery-header">
-                <div>
-                    <h1>Discover Music</h1>
-                    <p>Find your next favourite song</p>
-                </div>
-
-               <button
-               type="button"
-               className="add-song-button"
-               onClick={() => navigate("/add-song")}
-               >
-               + Add Song
-              </button>
-
-
                 <button
                     type="button"
                     className="profile-button"
@@ -101,7 +87,31 @@ function Discovery() {
                 >
                     Profile
                 </button>
+
+                <div>
+                    <h1>Discover Music</h1>
+                    <p>Find your next favourite song</p>
+                </div>
+
+                {user && (
+                    <button
+                        type="button"
+                        className="logout-button"
+                        onClick={logout}
+                        disabled={authLoading}
+                    >
+                        {authLoading ? "Logging out..." : "Logout"}
+                    </button>
+                )}
             </div>
+
+            <button
+                type="button"
+                className="add-song-button"
+                onClick={() => navigate("/add-song")}
+            >
+                + Add Song
+            </button>
 
 
             {/* Search */}

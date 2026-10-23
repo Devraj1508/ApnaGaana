@@ -47,6 +47,23 @@
     transform: scale(1.03);
 }
 
+.playlists-page .edit-song-button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    transform: none;
+    filter: drop-shadow(0 1px 2px #000000);
+
+    &:hover {
+        background: transparent;
+        color: #ffffff;
+        transform: none;
+    }
+}
+
 .playlists-page button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -170,8 +187,27 @@
     background: #1d1d1d;
 }
 
-.playlist-song > button {
-    margin-top: 12px;
+.playlist-song-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.playlist-song > .song-card .song-card-actions {
+    justify-content: space-between;
+    gap: 0;
+    margin-top: 0.75rem;
+}
+
+.playlist-song-actions button {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 10px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Create and edit forms */
@@ -230,6 +266,22 @@
 
 .playlist-actions button:last-child:hover {
     background: #b91c1c;
+}
+
+.playlist-edit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0 !important;
+    border-radius: 50% !important;
+
+    svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
 }
 
 .error {
