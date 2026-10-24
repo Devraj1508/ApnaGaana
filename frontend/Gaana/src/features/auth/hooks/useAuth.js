@@ -4,12 +4,8 @@ import {registerUser, loginUser, getCurrentUser as fetchCurrentUser, logoutUser}
 
 const useAuth = () => {
     const [user,setUser] = useState(null);
-    const [loading,setLoading] = useState(false);
+    const [loading,setLoading] = useState(true);
     const [error,setError] = useState(null);
-
-    useEffect(() => {
-        getCurrentUser();
-    }, []);
 
     const register = async (userData) => {
         try{
@@ -53,12 +49,20 @@ const useAuth = () => {
             }
             return data;
         }catch(err){
+            if (err.response?.status === 401) {
+                setUser(null);
+                return null;
+            }
             setError(err.response?.data?.message || 'Failed to get current user');
             throw err;
         }finally{
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        void Promise.resolve().then(() => getCurrentUser());
+    }, []);
 
     const logout = async () => {
         const firstConfirmation = window.confirm(
