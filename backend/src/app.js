@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
+const path=require("path")
 
 const authRouter = require("./Router/auth.routes");
 const userprofileRouter = require("./Router/userprofile.routes");
@@ -22,6 +23,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname,"../public")))
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
@@ -33,6 +35,12 @@ app.use("/api/comments", commentsRouter);
 app.use("/api/playlists", playlistRouter);
 app.use("/api/listening-history", listeninghistoryRouter);
 app.use("/api/discovery", DiscoveryRouter);
+
+
+
+app.use("*name",(req,res)=>{
+    res.sendFile(path.join(__dirname,"public","index.html"))
+})
 
 //changing the one line to two lines for better readability
 module.exports = app;
