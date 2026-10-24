@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { getDiscoveryData, searchSongs } from "../service/discovery.api";
 
-const useDiscovery = (enabled = true) => {
+const useDiscovery = () => {
     const [discoveryData, setDiscoveryData] = useState(null);
-    const [loading, setLoading] = useState(enabled);
+    const [loading, setLoading] = useState(true);
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [searchError, setSearchError] = useState(null);
@@ -30,12 +30,8 @@ const useDiscovery = (enabled = true) => {
     };
 
     useEffect(() => {
-        if (!enabled) {
-            return;
-        }
-
-        void Promise.resolve().then(() => fetchDiscoveryData());
-    }, [enabled]);
+        fetchDiscoveryData();
+    }, []);
 
     const findSongs = async (query) => {
         const trimmedQuery = query.trim();

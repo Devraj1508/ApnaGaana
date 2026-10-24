@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../../app/context/Authcontext";
+import useAuth from "../hooks/useAuth";
 import "../style/auth.scss";
 
 const AuthForm = ({ type = "login" }) => {
@@ -13,7 +13,7 @@ const AuthForm = ({ type = "login" }) => {
         register,
         loading,
         error
-    } = useAuthContext();
+    } = useAuth();
 
     const [formData, setFormData] = useState({
         username: "",

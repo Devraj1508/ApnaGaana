@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../app/context/Authcontext";
 import SongCard from "../components/SongCard";
@@ -7,7 +7,6 @@ import MusicPlayer from "../../songs/components/MusicPlayer";
 import "../style/Discovery.scss";
 
 function Discovery() {
-    const { user, logout, loading: authLoading } = useAuthContext();
 
     const {
         discoveryData,
@@ -21,17 +20,12 @@ function Discovery() {
         clearSearch,
         replaceSong,
         removeSong
-    } = useDiscovery(!authLoading && Boolean(user));
+    } = useDiscovery();
 
     const [searchQuery, setSearchQuery] = useState("");
     const searchTimerRef = useRef(null);
+    const { user, logout, loading: authLoading } = useAuthContext();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!authLoading && !user) {
-            navigate("/login", { replace: true });
-        }
-    }, [authLoading, navigate, user]);
 
     const handleSearchQueryChange = (event) => {
         const nextQuery = event.target.value;
